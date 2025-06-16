@@ -126,7 +126,7 @@ Install the required USB drivers for your ESP32 board:
 
 ## 📜 License
 
-Distributed under the MIT License. See [LICENSE.txt](LICENSE.txt) for more information.
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
 
 ---
 
