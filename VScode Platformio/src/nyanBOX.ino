@@ -102,22 +102,11 @@ void enterMenu(AppMenuState st);
 void runApp(MenuItem &mi);
 
 MenuItem mainMenu[] = {
-  { "BLE",   bitmap_icon_ble,     nullptr, nullptr },
   { "WiFi",  bitmap_icon_wifi,    nullptr, nullptr },
+  { "BLE",   bitmap_icon_ble,     nullptr, nullptr },
   { "Other", bitmap_icon_scanner, nullptr, nullptr }
 };
 constexpr int MAIN_MENU_SIZE = sizeof(mainMenu) / sizeof(mainMenu[0]);
-
-MenuItem bleMenu[] = {
-  { "BLE Jammer",   nullptr, blejammerSetup,    blejammerLoop    },
-  { "BLE Spoofer",  nullptr, spooferSetup,      spooferLoop      },
-  { "Sour Apple",   nullptr, sourappleSetup,    sourappleLoop    },
-  { "BLE Scan",     nullptr, blescanSetup,      nullptr          },
-  { "BLE Spammer",  nullptr, bleSpamSetup,      bleSpamLoop      },
-  { "Flipper Scan", nullptr, flipperSetup,      nullptr          },
-  { "Back",         nullptr, nullptr,           nullptr          }
-};
-constexpr int BLE_MENU_SIZE = sizeof(bleMenu) / sizeof(bleMenu[0]);
 
 MenuItem wifiMenu[] = {
   { "WiFi Scan",       nullptr, wifiscanSetup,       wifiscanLoop       },
@@ -129,12 +118,23 @@ MenuItem wifiMenu[] = {
 };
 constexpr int WIFI_MENU_SIZE = sizeof(wifiMenu) / sizeof(wifiMenu[0]);
 
+MenuItem bleMenu[] = {
+  { "BLE Scan",     nullptr, blescanSetup,      nullptr          },
+  { "Flipper Scan", nullptr, flipperSetup,      nullptr          },
+  { "BLE Spammer",  nullptr, bleSpamSetup,      bleSpamLoop      },
+  { "BLE Jammer",   nullptr, blejammerSetup,    blejammerLoop    },
+  { "Sour Apple",   nullptr, sourappleSetup,    sourappleLoop    },
+  { "BLE Spoofer",  nullptr, spooferSetup,      spooferLoop      },
+  { "Back",         nullptr, nullptr,           nullptr          }
+};
+constexpr int BLE_MENU_SIZE = sizeof(bleMenu) / sizeof(bleMenu[0]);
+
 MenuItem otherMenu[] = {
+  { "Proto Kill",   nullptr, blackoutSetup,   blackoutLoop   },
   { "Scanner",      nullptr, scannerSetup,    scannerLoop    },
   { "Analyzer",     nullptr, analyzerSetup,   analyzerLoop   },
-  { "Proto Kill",   nullptr, blackoutSetup,   blackoutLoop   },
-  { "About",        nullptr, about,           about          },
   { "Setting",      nullptr, settingSetup,    settingLoop    },
+  { "About",        nullptr, about,           about          },
   { "Back",         nullptr, nullptr,         nullptr        }
 };
 constexpr int OTHER_MENU_SIZE = sizeof(otherMenu) / sizeof(otherMenu[0]);
@@ -147,13 +147,13 @@ void enterMenu(AppMenuState st) {
       currentMenuItems = mainMenu;
       currentMenuSize  = MAIN_MENU_SIZE;
       break;
-    case APP_BLE:
-      currentMenuItems = bleMenu;
-      currentMenuSize  = BLE_MENU_SIZE;
-      break;
     case APP_WIFI:
       currentMenuItems = wifiMenu;
       currentMenuSize  = WIFI_MENU_SIZE;
+      break;
+    case APP_BLE:
+      currentMenuItems = bleMenu;
+      currentMenuSize  = BLE_MENU_SIZE;
       break;
     case APP_OTHER:
       currentMenuItems = otherMenu;
@@ -213,10 +213,10 @@ void setup() {
   u8g2.print("by jbohack & zr_crackiin");
 
   u8g2.setFont(u8g2_font_6x10_tf); 
-  int16_t versionWidth = u8g2.getUTF8Width("v2.8.2");
+  int16_t versionWidth = u8g2.getUTF8Width("v2.8.3");
   int16_t versionX = (128 - versionWidth) / 2;
   u8g2.setCursor(versionX, 60);
-  u8g2.print("v2.8.2");
+  u8g2.print("v2.8.3");
   
   u8g2.sendBuffer(); 
   delay(1500);
@@ -268,8 +268,8 @@ void loop() {
   if (justPressed(BUTTON_SEL, selPrev)) {
     MenuItem &sel = currentMenuItems[item_selected];
     if (currentState == APP_MAIN) {
-      if (strcmp(sel.name, "BLE") == 0) enterMenu(APP_BLE);
-      else if (strcmp(sel.name, "WiFi") == 0) enterMenu(APP_WIFI);
+      if (strcmp(sel.name, "WiFi") == 0) enterMenu(APP_WIFI);
+      else if (strcmp(sel.name, "BLE") == 0) enterMenu(APP_BLE);
       else if (strcmp(sel.name, "Other") == 0) enterMenu(APP_OTHER);
     } else {
       if (strcmp(sel.name, "Back") == 0) enterMenu(APP_MAIN);

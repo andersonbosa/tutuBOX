@@ -54,14 +54,6 @@ The device combines the ESP32 Wroom32U, NRF24 modules, an OLED display, and othe
 
 ## 🎯 Features
 
-### 🔵 Bluetooth (BLE) Tools
-- **BLE Scanner** – Detects nearby BLE devices
-- **BLE Jammer** – Disrupts BLE device communication
-- **BLE Spammer** – Broadcasts BLE advertisement packets for testing
-- **BLE Spoofer** – Simulates BLE devices for testing and research
-- **Sour Apple** – Mimics Apple Bluetooth signals like AirPods pairing pop-up to test device resilience against protocol exploits.
-- **Flipper Scanner** – Detects nearby Flipper Zero devices
-
 ### 📶 WiFi Tools
 - **WiFi Scanner** – Detects nearby WiFi access points
 - **WiFi Deauther** – Disrupts 2.4GHz WiFi device communication
@@ -69,10 +61,18 @@ The device combines the ESP32 Wroom32U, NRF24 modules, an OLED display, and othe
 - **Beacon Spam** – Broadcasts multiple fake WiFi networks for testing
 - **WLAN Jammer** – Jams wireless communication on selected channels
 
+### 🔵 Bluetooth (BLE) Tools
+- **BLE Scanner** – Detects nearby BLE devices
+- **Flipper Scanner** – Detects nearby Flipper Zero devices
+- **BLE Spammer** – Broadcasts BLE advertisement packets for testing
+- **BLE Jammer** – Disrupts BLE device communication
+- **Sour Apple** – Mimics Apple Bluetooth signals like AirPods pairing pop-up to test device resilience against protocol exploits.
+- **BLE Spoofer** – Simulates BLE devices for testing and research
+
 ### 📡 Signal & Protocol Tools
+- **Proto Kill Mode** – Advanced tool for disrupting various wireless protocols
 - **Scanner** – Scans the 2.4GHz frequency band to detect active channels and devices
 - **Analyzer** – Analyzes detected signals and provides detailed activity information
-- **Proto Kill Mode** – Advanced tool for disrupting various wireless protocols
 
 ---
 
