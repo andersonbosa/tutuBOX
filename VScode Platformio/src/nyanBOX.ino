@@ -152,11 +152,15 @@ void runApp(MenuItem &mi) {
   if (mi.setup) {
     mi.setup();
     if (mi.loop) {
-      while (digitalRead(BUTTON_SEL) == LOW);
+      while (digitalRead(BUTTON_PIN_CENTER) == LOW);
       while (true) {
         mi.loop();
-        if (digitalRead(BUTTON_SEL) == LOW) {
-          while (digitalRead(BUTTON_SEL) == LOW);
+        if (digitalRead(BUTTON_PIN_CENTER) == LOW) {
+          while (digitalRead(BUTTON_PIN_CENTER) == LOW);
+          if (mi.setup == blackoutSetup || mi.setup == jammerSetup) {
+            for (auto &r : radios) r.powerDown();
+            esp_wifi_start();
+          }
           break;
         }
       }

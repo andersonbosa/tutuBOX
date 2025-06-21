@@ -10,6 +10,7 @@
 #include <BLEDevice.h>
 #include <esp_gap_ble_api.h>
 #include <string.h>
+#include <esp_system.h>
     
 extern U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2;
     
@@ -195,7 +196,7 @@ static void advertiseDevice(const char* chosenName) {
     
 void bleSpamSetup() {
     Serial.begin(115200);
-    randomSeed(analogRead(0));
+    randomSeed((uint32_t)esp_random());
     pinMode(BUTTON_PIN_CENTER, INPUT_PULLUP);
     pinMode(BUTTON_PIN_LEFT, INPUT_PULLUP);
     

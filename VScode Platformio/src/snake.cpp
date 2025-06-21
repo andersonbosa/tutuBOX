@@ -6,6 +6,7 @@
 #include <Arduino.h>
 #include <U8g2lib.h>
 #include "snake.h"
+#include <esp_system.h>
 
 extern U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2;
 
@@ -20,7 +21,7 @@ static uint16_t score = 0;
 static uint16_t highScore = 0;
 
 void snakeSetup(){
-  randomSeed(analogRead(0));
+  randomSeed((uint32_t)esp_random());
   snakeLen = 3;
   score = 0;
   snakeX[0] = SNAKE_COLS/2; snakeY[0] = SNAKE_ROWS/2;
