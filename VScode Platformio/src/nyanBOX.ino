@@ -32,6 +32,7 @@
 #include "../include/deauth.h"
 #include "../include/deauth_scanner.h"
 #include "../include/beacon_spam.h"
+#include "../include/pwnagotchi_detector.h"
 #include "../include/pindefs.h"
 #include "../include/blackout.h"
 #include "../include/about.h"
@@ -128,12 +129,13 @@ MenuItem mainMenu[] = {
 constexpr int MAIN_MENU_SIZE = sizeof(mainMenu) / sizeof(mainMenu[0]);
 
 MenuItem wifiMenu[] = {
-  { "WiFi Scan",       nullptr, wifiscanSetup,       wifiscanLoop       },
-  { "WiFi Deauther",   nullptr, deauthSetup,         deauthLoop         },
-  { "Deauth Scanner",  nullptr, deauthScannerSetup,  deauthScannerLoop },
-  { "Beacon Spam",     nullptr, beaconSpamSetup,     beaconSpamLoop     },
-  { "WLAN Jammer",     nullptr, jammerSetup,         jammerLoop         },
-  { "Back",            nullptr, nullptr,             nullptr            }
+  { "WiFi Scan",       nullptr, wifiscanSetup,           wifiscanLoop       },
+  { "WiFi Deauther",   nullptr, deauthSetup,             deauthLoop         },
+  { "Deauth Scanner",  nullptr, deauthScannerSetup,      deauthScannerLoop },
+  { "Beacon Spam",     nullptr, beaconSpamSetup,         beaconSpamLoop     },
+  { "WLAN Jammer",     nullptr, jammerSetup,             jammerLoop         },
+  { "Pwna Detector",   nullptr, pwnagotchiDetectorSetup, pwnagotchiDetectorLoop },
+  { "Back",            nullptr, nullptr,                 nullptr          }
 };
 constexpr int WIFI_MENU_SIZE = sizeof(wifiMenu) / sizeof(wifiMenu[0]);
 

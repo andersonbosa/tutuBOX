@@ -59,6 +59,7 @@ The device combines the ESP32 Wroom32U, NRF24 modules, an OLED display, and othe
 - **WiFi Deauther** – Disrupts 2.4GHz WiFi device communication
 - **Deauth Scanner** – Monitors and analyzes WiFi deauthentication frames in real-time
 - **Beacon Spam** – Broadcasts multiple fake WiFi networks for testing
+- **Pwnagotchi Detector (Pwna Detector)** – Detects nearby Pwnagotchi devices and displays their information
 - **WLAN Jammer** – Jams wireless communication on selected channels
 
 ### 🔵 Bluetooth (BLE) Tools
