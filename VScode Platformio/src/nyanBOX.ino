@@ -199,6 +199,9 @@ void runApp(MenuItem &mi) {
     if (digitalRead(BUTTON_SEL) == LOW) {
       updateLastActivity();
       while (digitalRead(BUTTON_SEL) == LOW);
+      if (mi.setup == blescanSetup) {
+        blescanExit();
+      }
       if (mi.setup == blackoutSetup || mi.setup == jammerSetup || mi.setup == blejammerSetup) {
         for (auto &r : radios) r.powerDown();
         esp_wifi_start();

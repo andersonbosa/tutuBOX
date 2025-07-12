@@ -108,6 +108,16 @@ void blescanSetup() {
   pinMode(BTN_BACK, INPUT_PULLUP);
 }
 
+void blescanExit() {
+  bleDevices.clear();
+  pBLEScan->stop();
+  BLEDevice::deinit();
+  currentIndex = listStartIndex = 0;
+  isDetailView = false;
+  lastButtonPress = 0;
+  isScanning = false;
+}
+
 void blescanLoop() {
   unsigned long now = millis();
 
