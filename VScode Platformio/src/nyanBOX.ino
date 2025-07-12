@@ -140,7 +140,7 @@ MenuItem wifiMenu[] = {
 constexpr int WIFI_MENU_SIZE = sizeof(wifiMenu) / sizeof(wifiMenu[0]);
 
 MenuItem bleMenu[] = {
-  { "BLE Scan",     nullptr, blescanSetup,      nullptr          },
+  { "BLE Scan",     nullptr, blescanSetup,      blescanLoop      },
   { "Flipper Scan", nullptr, flipperSetup,      nullptr          },
   { "BLE Spammer",  nullptr, bleSpamSetup,      bleSpamLoop      },
   { "BLE Jammer",   nullptr, blejammerSetup,    blejammerLoop    },
