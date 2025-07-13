@@ -94,6 +94,19 @@ bool         downPressed      = false;
 const unsigned long initialDelay   = 500;
 const unsigned long repeatInterval = 250;
 
+const int ITEM_HEIGHT = 16;
+const int ITEM_SPACING = 2;
+const int TEXT_X = 28;
+const int SELECTION_X = 4;
+const int SELECTION_WIDTH = 120;
+const int ICON_X = 8;
+
+void drawSelection(int x, int y, int width, int height, bool selected) {
+  if (selected) {
+    u8g2.drawBox(x, y+2, 2, height-4);
+  }
+}
+
 enum AppMenuState { APP_MAIN, APP_BLE, APP_WIFI, APP_OTHER };
 
 struct MenuItem {
@@ -145,7 +158,7 @@ void noCleanup() {
 MenuItem mainMenu[] = {
   { "WiFi",  bitmap_icon_wifi,    nullptr, nullptr, noCleanup },
   { "BLE",   bitmap_icon_ble,     nullptr, nullptr, noCleanup },
-  { "Other", bitmap_icon_scanner, nullptr, nullptr, noCleanup }
+  { "Other", bitmap_icon_analyzer, nullptr, nullptr, noCleanup }
 };
 constexpr int MAIN_MENU_SIZE = sizeof(mainMenu) / sizeof(mainMenu[0]);
 
@@ -155,14 +168,14 @@ MenuItem wifiMenu[] = {
   { "Deauth Scanner",  nullptr, deauthScannerSetup,      deauthScannerLoop,      cleanupWiFi },
   { "Beacon Spam",     nullptr, beaconSpamSetup,         beaconSpamLoop,         cleanupWiFi },
   { "WLAN Jammer",     nullptr, jammerSetup,             jammerLoop,             cleanupRadio },
-  { "Pwna Detector",   nullptr, pwnagotchiDetectorSetup, pwnagotchiDetectorLoop, cleanupWiFi },
+  { "Pwnagotchi Detector", nullptr, pwnagotchiDetectorSetup, pwnagotchiDetectorLoop, cleanupWiFi },
   { "Back",            nullptr, nullptr,                 nullptr,                noCleanup }
 };
 constexpr int WIFI_MENU_SIZE = sizeof(wifiMenu) / sizeof(wifiMenu[0]);
 
 MenuItem bleMenu[] = {
   { "BLE Scan",     nullptr, blescanSetup,             blescanLoop,             cleanupBLE },
-  { "Flipper Scan", nullptr, flipperZeroDetectorSetup, flipperZeroDetectorLoop, cleanupBLE },
+  { "Flipper Zero Detector", nullptr, flipperZeroDetectorSetup, flipperZeroDetectorLoop, cleanupBLE },
   { "BLE Spammer",  nullptr, bleSpamSetup,             bleSpamLoop,             cleanupBLE },
   { "BLE Jammer",   nullptr, blejammerSetup,           blejammerLoop,           cleanupRadio },
   { "Sour Apple",   nullptr, sourappleSetup,           sourappleLoop,           cleanupBLE },
@@ -254,36 +267,37 @@ void setup() {
   updateLastActivity();
 
   u8g2.clearBuffer();
-  u8g2.setFont(u8g2_font_ncenB14_tr);
-  const char* title = "nyan-BOX";
+  
+  u8g2.setFont(u8g2_font_helvB14_tr);
+  const char* title = "nyanBOX";
   int16_t titleW = u8g2.getUTF8Width(title);
   u8g2.setCursor((128 - titleW) / 2, 16);
   u8g2.print(title);
 
-  u8g2.setFont(u8g2_font_6x10_tf);
+  u8g2.setFont(u8g2_font_helvR08_tr);
   const char* url = "nyanBOX.lullaby.cafe";
   int16_t urlW = u8g2.getUTF8Width(url);
   u8g2.setCursor((128 - urlW) / 2, 32);
   u8g2.print(url);
 
-  u8g2.setFont(u8g2_font_ncenB08_tr);
-  int16_t creditWidth = u8g2.getUTF8Width("jbohack & zr_crackiin");
+  u8g2.setFont(u8g2_font_helvR08_tr);
+  int16_t creditWidth = u8g2.getUTF8Width("by jbohack & zr_crackiin");
   int16_t creditX = (128 - creditWidth) / 2;
   u8g2.setCursor(creditX, 50);
-  u8g2.print("jbohack & zr_crackiin");
+  u8g2.print("by jbohack & zr_crackiin");
 
-  u8g2.setFont(u8g2_font_6x10_tf);
+  u8g2.setFont(u8g2_font_helvR08_tr);
   int16_t verW = u8g2.getUTF8Width(nyanboxVersion);
   u8g2.setCursor((128 - verW) / 2, 62);
   u8g2.print(nyanboxVersion);
 
   u8g2.sendBuffer();
-  delay(1500);
+  delay(2000);
 
   u8g2.clearBuffer();
   u8g2.drawXBMP(0, 0, 128, 64, logo_nyanbox);
   u8g2.sendBuffer();
-  delay(1000);
+  delay(1500);
 
   pinMode(BUTTON_PIN_UP, INPUT_PULLUP);
   pinMode(BUTTON_PIN_CENTER, INPUT_PULLUP);
@@ -343,33 +357,32 @@ void loop() {
   }
 
   u8g2.clearBuffer();
+  
   int start;
   if (item_selected == 0) start = 0;
   else if (item_selected == currentMenuSize - 1) start = max(0, currentMenuSize - 3);
   else start = item_selected - 1;
 
-  static const int yPos[3]   = {15, 37, 59};
-  static const int boxY[3]   = { 0, 22, 44};
-  static const uint8_t *fonts[3] = { u8g_font_7x14, u8g_font_7x14B, u8g_font_7x14 };
-
   int highlight = item_selected - start;
-  u8g2.drawXBMP(0, boxY[highlight], 128, 21, bitmap_item_sel_outline);
+  
+  int selectionY = 6 + (highlight * (ITEM_HEIGHT + ITEM_SPACING));
+  drawSelection(SELECTION_X, selectionY, SELECTION_WIDTH, ITEM_HEIGHT, true);
 
   for (int i = 0; i < 3; i++) {
     int idx = start + i;
     if (idx < currentMenuSize) {
-      u8g2.setFont(fonts[i]);
-      u8g2.drawStr(25, yPos[i], currentMenuItems[idx].name);
+      int itemY = 6 + (i * (ITEM_HEIGHT + ITEM_SPACING));
+      int textY = itemY + 11;
+      
+      u8g2.setFont(u8g2_font_helvR08_tr);
+      u8g2.drawStr(TEXT_X, textY, currentMenuItems[idx].name);
+      
       if (currentMenuItems[idx].icon) {
-        int iconY = (i == 0 ? 2 : i == 1 ? 24 : 46);
-        u8g2.drawXBMP(4, iconY, 16, 16, currentMenuItems[idx].icon);
+        int iconY = itemY;
+        u8g2.drawXBMP(ICON_X, iconY, 16, 16, currentMenuItems[idx].icon);
       }
     }
   }
-
-  int boxH = 64 / currentMenuSize;
-  u8g2.drawXBMP(120, 0, 8, 64, bitmap_scrollbar_background);
-  u8g2.drawBox(125, boxH * item_selected, 3, boxH);
 
   u8g2.sendBuffer();
 }
