@@ -99,6 +99,12 @@ class MyFlipperAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
 };
 
 void flipperZeroDetectorSetup() {
+  flipperZeroDevices.clear();
+  currentIndex = listStartIndex = 0;
+  isDetailView = false;
+  lastButtonPress = 0;
+  isScanning = false;
+
   u8g2.begin();
   u8g2.setFont(u8g2_font_6x10_tr);
   u8g2.clearBuffer();
@@ -122,16 +128,6 @@ void flipperZeroDetectorSetup() {
   pinMode(BTN_RIGHT, INPUT_PULLUP);
   pinMode(BTN_BACK, INPUT_PULLUP);
   pinMode(BTN_CENTER, INPUT_PULLUP);
-}
-
-void flipperZeroDetectorExit() {
-  flipperZeroDevices.clear();
-  pBLEScan->stop();
-  BLEDevice::deinit();
-  currentIndex = listStartIndex = 0;
-  isDetailView = false;
-  lastButtonPress = 0;
-  isScanning = false;
 }
 
 void flipperZeroDetectorLoop() {

@@ -85,6 +85,12 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
 };
 
 void blescanSetup() {
+  bleDevices.clear();
+  currentIndex = listStartIndex = 0;
+  isDetailView = false;
+  lastButtonPress = 0;
+  isScanning = false;
+
   u8g2.begin();
   u8g2.setFont(u8g2_font_6x10_tr);
   u8g2.clearBuffer();
@@ -106,16 +112,6 @@ void blescanSetup() {
   pinMode(BTN_DOWN, INPUT_PULLUP);
   pinMode(BTN_RIGHT, INPUT_PULLUP);
   pinMode(BTN_BACK, INPUT_PULLUP);
-}
-
-void blescanExit() {
-  bleDevices.clear();
-  pBLEScan->stop();
-  BLEDevice::deinit();
-  currentIndex = listStartIndex = 0;
-  isDetailView = false;
-  lastButtonPress = 0;
-  isScanning = false;
 }
 
 void blescanLoop() {

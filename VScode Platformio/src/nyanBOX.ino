@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <Adafruit_NeoPixel.h>
 #include <EEPROM.h>
+#include <esp_wifi.h>
 
 #ifdef U8X8_HAVE_HW_I2C
 #include <Wire.h>
@@ -93,14 +94,16 @@ bool         downPressed      = false;
 const unsigned long initialDelay   = 500;
 const unsigned long repeatInterval = 250;
 
+enum AppMenuState { APP_MAIN, APP_BLE, APP_WIFI, APP_OTHER };
+
 struct MenuItem {
   const char* name;
   const unsigned char* icon;
   void (*setup)();
   void (*loop)();
+  void (*cleanup)();
 };
 
-enum AppMenuState { APP_MAIN, APP_BLE, APP_WIFI, APP_OTHER };
 AppMenuState currentState = APP_MAIN;
 MenuItem*    currentMenuItems = nullptr;
 int          currentMenuSize  = 0;
@@ -121,42 +124,60 @@ bool justPressed(uint8_t pin, bool &prev) {
 void enterMenu(AppMenuState st);
 void runApp(MenuItem &mi);
 
+void cleanupWiFi() {
+  esp_wifi_stop();
+  esp_wifi_start();
+}
+
+void cleanupRadio() {
+  for (auto &r : radios) r.powerDown();
+  esp_wifi_start();
+}
+
+void cleanupBLE() {
+  esp_ble_gap_stop_advertising();
+  BLEDevice::deinit();
+}
+
+void noCleanup() {
+}
+
 MenuItem mainMenu[] = {
-  { "WiFi",  bitmap_icon_wifi,    nullptr, nullptr },
-  { "BLE",   bitmap_icon_ble,     nullptr, nullptr },
-  { "Other", bitmap_icon_scanner, nullptr, nullptr }
+  { "WiFi",  bitmap_icon_wifi,    nullptr, nullptr, noCleanup },
+  { "BLE",   bitmap_icon_ble,     nullptr, nullptr, noCleanup },
+  { "Other", bitmap_icon_scanner, nullptr, nullptr, noCleanup }
 };
 constexpr int MAIN_MENU_SIZE = sizeof(mainMenu) / sizeof(mainMenu[0]);
 
 MenuItem wifiMenu[] = {
-  { "WiFi Scan",       nullptr, wifiscanSetup,           wifiscanLoop       },
-  { "WiFi Deauther",   nullptr, deauthSetup,             deauthLoop         },
-  { "Deauth Scanner",  nullptr, deauthScannerSetup,      deauthScannerLoop },
-  { "Beacon Spam",     nullptr, beaconSpamSetup,         beaconSpamLoop     },
-  { "WLAN Jammer",     nullptr, jammerSetup,             jammerLoop         },
-  { "Pwna Detector",   nullptr, pwnagotchiDetectorSetup, pwnagotchiDetectorLoop },
-  { "Back",            nullptr, nullptr,                 nullptr          }
+  { "WiFi Scan",       nullptr, wifiscanSetup,           wifiscanLoop,           cleanupWiFi },
+  { "WiFi Deauther",   nullptr, deauthSetup,             deauthLoop,             cleanupWiFi },
+  { "Deauth Scanner",  nullptr, deauthScannerSetup,      deauthScannerLoop,      cleanupWiFi },
+  { "Beacon Spam",     nullptr, beaconSpamSetup,         beaconSpamLoop,         cleanupWiFi },
+  { "WLAN Jammer",     nullptr, jammerSetup,             jammerLoop,             cleanupRadio },
+  { "Pwna Detector",   nullptr, pwnagotchiDetectorSetup, pwnagotchiDetectorLoop, cleanupWiFi },
+  { "Back",            nullptr, nullptr,                 nullptr,                noCleanup }
 };
 constexpr int WIFI_MENU_SIZE = sizeof(wifiMenu) / sizeof(wifiMenu[0]);
 
 MenuItem bleMenu[] = {
-  { "BLE Scan",     nullptr, blescanSetup,             blescanLoop      },
-  { "Flipper Scan", nullptr, flipperZeroDetectorSetup, flipperZeroDetectorLoop },
-  { "BLE Spammer",  nullptr, bleSpamSetup,             bleSpamLoop      },
-  { "BLE Jammer",   nullptr, blejammerSetup,           blejammerLoop    },
-  { "Sour Apple",   nullptr, sourappleSetup,           sourappleLoop    },
-  { "BLE Spoofer",  nullptr, spooferSetup,             spooferLoop      },
-  { "Back",         nullptr, nullptr,                  nullptr          }
+  { "BLE Scan",     nullptr, blescanSetup,             blescanLoop,             cleanupBLE },
+  { "Flipper Scan", nullptr, flipperZeroDetectorSetup, flipperZeroDetectorLoop, cleanupBLE },
+  { "BLE Spammer",  nullptr, bleSpamSetup,             bleSpamLoop,             cleanupBLE },
+  { "BLE Jammer",   nullptr, blejammerSetup,           blejammerLoop,           cleanupRadio },
+  { "Sour Apple",   nullptr, sourappleSetup,           sourappleLoop,           cleanupBLE },
+  { "BLE Spoofer",  nullptr, spooferSetup,             spooferLoop,             cleanupBLE },
+  { "Back",         nullptr, nullptr,                  nullptr,                 noCleanup }
 };
 constexpr int BLE_MENU_SIZE = sizeof(bleMenu) / sizeof(bleMenu[0]);
 
 MenuItem otherMenu[] = {
-  { "Proto Kill",   nullptr, blackoutSetup,   blackoutLoop   },
-  { "Scanner",      nullptr, scannerSetup,    scannerLoop    },
-  { "Analyzer",     nullptr, analyzerSetup,   analyzerLoop   },
-  { "Setting",      nullptr, settingSetup,    settingLoop    },
-  { "About",        nullptr, aboutSetup,      aboutLoop      },
-  { "Back",         nullptr, nullptr,         nullptr        }
+  { "Proto Kill",   nullptr, blackoutSetup,   blackoutLoop,   cleanupRadio },
+  { "Scanner",      nullptr, scannerSetup,    scannerLoop,    cleanupRadio },
+  { "Analyzer",     nullptr, analyzerSetup,   analyzerLoop,   cleanupRadio },
+  { "Setting",      nullptr, settingSetup,    settingLoop,    noCleanup },
+  { "About",        nullptr, aboutSetup,      aboutLoop,      noCleanup },
+  { "Back",         nullptr, nullptr,         nullptr,        noCleanup }
 };
 constexpr int OTHER_MENU_SIZE = sizeof(otherMenu) / sizeof(otherMenu[0]);
 
@@ -199,16 +220,11 @@ void runApp(MenuItem &mi) {
     if (digitalRead(BUTTON_SEL) == LOW) {
       updateLastActivity();
       while (digitalRead(BUTTON_SEL) == LOW);
-      if (mi.setup == blescanSetup) {
-        blescanExit();
+
+      if (mi.cleanup) {
+        mi.cleanup();
       }
-      if (mi.setup == flipperZeroDetectorSetup) {
-        flipperZeroDetectorExit();
-      }
-      if (mi.setup == blackoutSetup || mi.setup == jammerSetup || mi.setup == blejammerSetup) {
-        for (auto &r : radios) r.powerDown();
-        esp_wifi_start();
-      }
+      
       break;
     }
   }

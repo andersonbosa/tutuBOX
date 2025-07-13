@@ -13,6 +13,5 @@
 
 void flipperZeroDetectorSetup();
 void flipperZeroDetectorLoop();
-void flipperZeroDetectorExit();
 
 #endif
