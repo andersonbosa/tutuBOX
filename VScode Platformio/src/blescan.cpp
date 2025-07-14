@@ -23,7 +23,7 @@ struct BLEDeviceData {
 };
 static std::vector<BLEDeviceData> bleDevices;
 
-const int MAX_DEVICES = 50;
+const int MAX_DEVICES = 100;
 
 int currentIndex = 0;
 int listStartIndex = 0;
