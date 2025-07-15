@@ -9,8 +9,10 @@
 
 #include <WiFi.h>
 #include "esp_wifi.h"
-
-extern bool isBeaconSpamming;
+#include <vector>
+#include "pindefs.h"
+#include <stdint.h>
+#include <U8g2lib.h>
 
 void beaconSpamSetup();
 void beaconSpamLoop();
