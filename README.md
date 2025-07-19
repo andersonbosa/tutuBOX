@@ -60,7 +60,8 @@ The device combines the ESP32 Wroom32U, NRF24 modules, an OLED display, and othe
 - **WiFi Deauther** – Disrupts 2.4GHz WiFi device communication
 - **Deauth Scanner** – Monitors and analyzes WiFi deauthentication frames in real-time
 - **Beacon Spam** – Broadcasts multiple fake WiFi networks for testing. Choose to clone real nearby networks, select specific SSIDs, or use a list of random names.
-- **Pwnagotchi Detector (Pwna Detector)** – Detects nearby Pwnagotchi devices and displays their information
+- **Pwnagotchi Detector** – Detects nearby Pwnagotchi devices and displays their information
+- **Pwnagotchi Spam** - Pwnagotchi grid flooding tool that generates fake beacon frames with randomized identities, faces, names, and versions (contains optional DoS mode).
 - **WLAN Jammer** – Jams wireless communication on selected channels
 
 ### 🔵 Bluetooth (BLE) Tools
@@ -168,6 +169,7 @@ If you find nyanBox useful, please consider supporting the project:
 - [Universal-RC-system](https://github.com/alexbeliaev/Universal-RC-system)
 - [AppleJuice](https://github.com/ECTO-1A/AppleJuice)
 - [ESP32-Sour-Apple](https://github.com/RapierXbox/ESP32-Sour-Apple)
+- [PwnGridSpam](https://github.com/7h30th3r0n3/PwnGridSpam)
 - [Original nRFBOX Project](https://github.com/cifertech/nrfbox)
 
 ### Community

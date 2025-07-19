@@ -38,6 +38,7 @@
 #include "../include/blackout.h"
 #include "../include/about.h"
 #include "../include/channel_analyzer.h"
+#include "../include/pwnagotchi_spam.h"
 
 RF24 radios[] = {
   RF24(RADIO_CE_PIN_1, RADIO_CSN_PIN_1),
@@ -175,6 +176,7 @@ MenuItem wifiMenu[] = {
   { "Beacon Spam",     nullptr, beaconSpamSetup,         beaconSpamLoop,         cleanupWiFi },
   { "WLAN Jammer",     nullptr, jammerSetup,             jammerLoop,             cleanupRadio },
   { "Pwnagotchi Detector", nullptr, pwnagotchiDetectorSetup, pwnagotchiDetectorLoop, cleanupWiFi },
+  { "Pwnagotchi Spam", nullptr, pwnagotchiSpamSetup,     pwnagotchiSpamLoop,     cleanupWiFi },
   { "Back",            nullptr, nullptr,                 nullptr,                noCleanup }
 };
 constexpr int WIFI_MENU_SIZE = sizeof(wifiMenu) / sizeof(wifiMenu[0]);
