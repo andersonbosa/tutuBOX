@@ -16,7 +16,8 @@ static unsigned long startTime = 0;
 static int currentFaceIndex = 0;
 static int currentNameIndex = 0;
 static int currentChannel = 0;
-static bool dosMode = false;
+enum SpamMode { NORMAL_MODE, RANDOM_MODE, DOS_MODE };
+static SpamMode currentMode = NORMAL_MODE;
 
 const uint8_t channels[] = {1, 6, 11};
 const int numChannels = sizeof(channels) / sizeof(channels[0]);
@@ -68,6 +69,9 @@ const char* names[] = {
 const int numFaces = sizeof(faces) / sizeof(faces[0]);
 const int numNames = sizeof(names) / sizeof(names[0]);
 
+const char randomChars[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+-=[]{}|;:,.<>?";
+const int numRandomChars = sizeof(randomChars) - 1;
+
 // DoS faces (freeze screen)
 const char* dosFace = "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■";
 const char* dosName = "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■";
@@ -102,6 +106,17 @@ String generateRandomVersion() {
     int patch = random(0, 10);
     
     return String(major) + "." + String(minor) + "." + String(patch);
+}
+
+String generateRandomName() {
+    int nameLength = random(6, 13);
+    String randomName = "";
+    
+    for (int i = 0; i < nameLength; i++) {
+        randomName += randomChars[random(0, numRandomChars)];
+    }
+    
+    return randomName;
 }
 
 String generateRandomGridVersion() {
@@ -171,7 +186,7 @@ void pwnagotchiSpamSetup() {
     currentFaceIndex = 0;
     currentNameIndex = 0;
     currentChannel = 0;
-    dosMode = false;
+    currentMode = NORMAL_MODE;
 }
 
 void pwnagotchiSpamLoop() {
@@ -184,21 +199,35 @@ void pwnagotchiSpamLoop() {
     }
     
     if (digitalRead(BUTTON_PIN_DOWN) == LOW) {
-        dosMode = !dosMode;
+        currentMode = static_cast<SpamMode>((currentMode + 1) % 3);
         updateLastActivity();
         delay(200);
     }
 
-    if (spamActive && (now - lastBeacon >= 200)) {
-        if (dosMode) {
-            sendPwnagotchiBeacon(channels[currentChannel], dosFace, dosName);
-        } else {
-            sendPwnagotchiBeacon(channels[currentChannel], 
-                               faces[currentFaceIndex], 
-                               names[currentNameIndex]);
-            
-            currentFaceIndex = (currentFaceIndex + 1) % numFaces;
-            currentNameIndex = (currentNameIndex + 1) % numNames;
+    unsigned long spamDelay = 200;
+    
+    if (spamActive && (now - lastBeacon >= spamDelay)) {
+        switch (currentMode) {
+            case NORMAL_MODE:
+                sendPwnagotchiBeacon(channels[currentChannel], 
+                                   faces[currentFaceIndex], 
+                                   names[currentNameIndex]);
+                currentFaceIndex = (currentFaceIndex + 1) % numFaces;
+                currentNameIndex = (currentNameIndex + 1) % numNames;
+                break;
+                
+            case RANDOM_MODE:
+                {
+                    String randomName = generateRandomName();
+                    sendPwnagotchiBeacon(channels[currentChannel], 
+                                       faces[random(numFaces)], 
+                                       randomName.c_str());
+                }
+                break;
+                
+            case DOS_MODE:
+                sendPwnagotchiBeacon(channels[currentChannel], dosFace, dosName);
+                break;
         }
         
         currentChannel = (currentChannel + 1) % numChannels;
@@ -221,7 +250,12 @@ void pwnagotchiSpamLoop() {
     u8g2.drawStr((128 - statusWidth) / 2, 26, status);
     
     u8g2.setFont(u8g2_font_helvR08_tr);
-    const char* mode = dosMode ? "DoS Mode" : "Normal";
+    const char* mode;
+    switch (currentMode) {
+        case NORMAL_MODE: mode = "Normal"; break;
+        case RANDOM_MODE: mode = "Random"; break;
+        case DOS_MODE: mode = "DoS Mode"; break;
+    }
     int modeWidth = u8g2.getUTF8Width(mode);
     u8g2.drawStr((128 - modeWidth) / 2, 36, mode);
     
@@ -231,7 +265,7 @@ void pwnagotchiSpamLoop() {
     u8g2.drawStr((128 - statsWidth) / 2, 46, statsText);
     
     u8g2.setFont(u8g2_font_4x6_tr);
-    const char* line1 = "UP=Start/Stop  DOWN=DoS Mode";
+    const char* line1 = "UP=Start/Stop  DOWN=Mode";
     const char* line2 = "SEL=Exit";
     
     int line1Width = u8g2.getUTF8Width(line1);
