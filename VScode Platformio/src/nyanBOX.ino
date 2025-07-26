@@ -39,6 +39,7 @@
 #include "../include/about.h"
 #include "../include/channel_analyzer.h"
 #include "../include/pwnagotchi_spam.h"
+#include "../include/level_system.h"
 
 RF24 radios[] = {
   RF24(RADIO_CE_PIN_1, RADIO_CSN_PIN_1),
@@ -109,7 +110,7 @@ void drawSelection(int x, int y, int width, int height, bool selected) {
   }
 }
 
-enum AppMenuState { APP_MAIN, APP_BLE, APP_WIFI, APP_OTHER };
+enum AppMenuState { APP_MAIN, APP_BLE, APP_WIFI, APP_OTHER, APP_LEVEL };
 
 struct MenuItem {
   const char* name;
@@ -127,13 +128,90 @@ int          item_selected    = 0;
 constexpr uint8_t BUTTON_UP    = BUTTON_PIN_UP;
 constexpr uint8_t BUTTON_SEL   = BUTTON_PIN_CENTER;
 constexpr uint8_t BUTTON_DOWN  = BUTTON_PIN_DOWN;
+constexpr uint8_t BUTTON_RIGHT = BUTTON_PIN_RIGHT;
+constexpr uint8_t BUTTON_LEFT  = BUTTON_PIN_LEFT;
 bool selPrev = false;
+bool rightPrev = false;
+bool leftPrev = false;
+
+static unsigned long appStartTime = 0;
+static unsigned long lastXPReward = 0;
+static unsigned long pausedTime = 0;
+static bool xpPaused = false;
+static const char* currentAppName = "";
+static bool inApplication = false;
+static int pendingXP = 0;
+const unsigned long XP_REWARD_INTERVAL = 60000;
 
 bool justPressed(uint8_t pin, bool &prev) {
   bool now = digitalRead(pin) == LOW;
   if (now && !prev) { prev = true; return true; }
   if (!now) prev = false;
   return false;
+}
+
+void startAppTracking(const char* appName) {
+  currentAppName = appName;
+  appStartTime = millis();
+  lastXPReward = appStartTime;
+  xpPaused = false;
+  inApplication = true;
+}
+
+void stopAppTracking() {
+  if (inApplication) {
+    unsigned long appDuration = millis() - appStartTime;
+    
+    if (appDuration > 600000) {
+      pendingXP += 12;
+    } else if (appDuration > 300000) {
+      pendingXP += 4;
+    }
+    
+    if (pendingXP > 0) {
+      addXP(pendingXP);
+      pendingXP = 0;
+    }
+    
+    inApplication = false;
+    currentAppName = "";
+    xpPaused = false;
+  }
+}
+
+void updateAppXP() {
+  if (!inApplication) return;
+  
+  if (displayOff && !xpPaused) {
+    pausedTime = millis() - lastXPReward;
+    xpPaused = true;
+  } else if (!displayOff && xpPaused) {
+    lastXPReward = millis() - pausedTime;
+    xpPaused = false;
+  }
+  
+  if (!displayOff && millis() - lastXPReward >= XP_REWARD_INTERVAL) {
+    int xpAmount = 2;
+    
+    if (strstr(currentAppName, "Scan") != nullptr || 
+        strstr(currentAppName, "Detector") != nullptr ||
+        strstr(currentAppName, "Analyzer") != nullptr) {
+      xpAmount = 3;
+    } else if (strstr(currentAppName, "Jammer") != nullptr || 
+               strstr(currentAppName, "Deauth") != nullptr ||
+               strstr(currentAppName, "Spam") != nullptr ||
+               strstr(currentAppName, "Sour Apple") != nullptr ||
+               strstr(currentAppName, "Spoofer") != nullptr ||
+               strstr(currentAppName, "Proto Kill") != nullptr) {
+      xpAmount = 4;
+    } else if (strstr(currentAppName, "Setting") != nullptr ||
+               strstr(currentAppName, "About") != nullptr) {
+      xpAmount = 2;
+    }
+    
+    pendingXP += xpAmount;
+    lastXPReward = millis();
+  }
 }
 
 void enterMenu(AppMenuState st);
@@ -227,6 +305,9 @@ void enterMenu(AppMenuState st) {
 
 void runApp(MenuItem &mi) {
   if (!mi.setup) return;
+  
+  startAppTracking(mi.name);
+  
   mi.setup();
   updateLastActivity();
   displayOff = false;
@@ -237,6 +318,7 @@ void runApp(MenuItem &mi) {
 
   while (true) {
     checkIdle();
+    updateAppXP();
     mi.loop();
     if (digitalRead(BUTTON_SEL) == LOW) {
       updateLastActivity();
@@ -250,6 +332,7 @@ void runApp(MenuItem &mi) {
     }
   }
 
+  stopAppTracking();
   u8g2.clearBuffer();
 }
 
@@ -313,11 +396,13 @@ void setup() {
   pinMode(BUTTON_PIN_RIGHT, INPUT_PULLUP);
   pinMode(BUTTON_PIN_LEFT, INPUT_PULLUP);
 
+  levelSystemSetup();
   enterMenu(APP_MAIN);
 }
 
 void loop() {
   checkIdle();
+  updateAppXP();
 
   bool upNow = (digitalRead(BUTTON_PIN_UP) == LOW);
   bool downNow = (digitalRead(BUTTON_PIN_DOWN) == LOW);
@@ -350,47 +435,80 @@ void loop() {
 
   if (justPressed(BUTTON_SEL, selPrev)) {
     updateLastActivity();
-    MenuItem &sel = currentMenuItems[item_selected];
-    if (currentState == APP_MAIN) {
-      if (strcmp(sel.name, "WiFi") == 0) enterMenu(APP_WIFI);
-      else if (strcmp(sel.name, "BLE") == 0) enterMenu(APP_BLE);
-      else if (strcmp(sel.name, "Other") == 0) enterMenu(APP_OTHER);
-    } else {
-      if (strcmp(sel.name, "Back") == 0) {
-        enterMenu(APP_MAIN);
+    if (currentState != APP_LEVEL) {
+      MenuItem &sel = currentMenuItems[item_selected];
+      if (currentState == APP_MAIN) {
+        if (strcmp(sel.name, "WiFi") == 0) enterMenu(APP_WIFI);
+        else if (strcmp(sel.name, "BLE") == 0) enterMenu(APP_BLE);
+        else if (strcmp(sel.name, "Other") == 0) enterMenu(APP_OTHER);
       } else {
-        runApp(sel);
+        if (strcmp(sel.name, "Back") == 0) {
+          enterMenu(APP_MAIN);
+        } else {
+          runApp(sel);
+        }
       }
     }
   }
 
-  u8g2.clearBuffer();
-  
-  int start;
-  if (item_selected == 0) start = 0;
-  else if (item_selected == currentMenuSize - 1) start = max(0, currentMenuSize - 3);
-  else start = item_selected - 1;
-
-  int highlight = item_selected - start;
-  
-  int selectionY = 6 + (highlight * (ITEM_HEIGHT + ITEM_SPACING));
-  drawSelection(SELECTION_X, selectionY, SELECTION_WIDTH, ITEM_HEIGHT, true);
-
-  for (int i = 0; i < 3; i++) {
-    int idx = start + i;
-    if (idx < currentMenuSize) {
-      int itemY = 6 + (i * (ITEM_HEIGHT + ITEM_SPACING));
-      int textY = itemY + 11;
-      
-      u8g2.setFont(u8g2_font_helvR08_tr);
-      u8g2.drawStr(TEXT_X, textY, currentMenuItems[idx].name);
-      
-      if (currentMenuItems[idx].icon) {
-        int iconY = itemY;
-        u8g2.drawXBMP(ICON_X, iconY, 16, 16, currentMenuItems[idx].icon);
-      }
+  if (justPressed(BUTTON_LEFT, leftPrev)) {
+    updateLastActivity();
+    if (currentState == APP_LEVEL) {
+      enterMenu(APP_MAIN);
     }
   }
 
-  u8g2.sendBuffer();
+  if (justPressed(BUTTON_RIGHT, rightPrev)) {
+    updateLastActivity();
+    if (currentState == APP_MAIN) {
+      currentState = APP_LEVEL;
+      levelSystemSetup();
+    }
+  }
+
+  if (currentState == APP_LEVEL) {
+    levelSystemLoop();
+  } else {
+    u8g2.clearBuffer();
+    
+    int start;
+    if (item_selected == 0) start = 0;
+    else if (item_selected == currentMenuSize - 1) start = max(0, currentMenuSize - 3);
+    else start = item_selected - 1;
+
+    int highlight = item_selected - start;
+    
+    int selectionY = 6 + (highlight * (ITEM_HEIGHT + ITEM_SPACING));
+    drawSelection(SELECTION_X, selectionY, SELECTION_WIDTH, ITEM_HEIGHT, true);
+
+    for (int i = 0; i < 3; i++) {
+      int idx = start + i;
+      if (idx < currentMenuSize) {
+        int itemY = 6 + (i * (ITEM_HEIGHT + ITEM_SPACING));
+        int textY = itemY + 11;
+        
+        u8g2.setFont(u8g2_font_helvR08_tr);
+        u8g2.drawStr(TEXT_X, textY, currentMenuItems[idx].name);
+        
+        if (currentMenuItems[idx].icon) {
+          int iconY = itemY;
+          u8g2.drawXBMP(ICON_X, iconY, 16, 16, currentMenuItems[idx].icon);
+        }
+      }
+    }
+
+    if (currentState == APP_MAIN) {
+      u8g2.setFont(u8g2_font_5x8_tr);
+      char levelStr[16];
+      sprintf(levelStr, "Level %d", getCurrentLevel());
+      int levelWidth = u8g2.getUTF8Width(levelStr);
+      u8g2.drawStr(128 - levelWidth, 8, levelStr);
+      
+      const char* hint = "Level Menu ->";
+      int hintWidth = u8g2.getUTF8Width(hint);
+      u8g2.drawStr(128 - hintWidth, 64, hint);
+    }
+
+    u8g2.sendBuffer();
+  }
 }

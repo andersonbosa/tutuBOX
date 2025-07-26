@@ -77,6 +77,19 @@ The device combines the ESP32 Wroom32U, NRF24 modules, an OLED display, and othe
 - **Scanner** – Scans the 2.4GHz frequency band to detect active channels and devices
 - **Analyzer** – Analyzes detected signals and provides detailed activity information
 
+### 🎮 Leveling System
+nyanBOX features a built-in RPG-style leveling system that tracks your usage throughout using the device:
+
+- **Level Progression** – Gain XP by using different tools and features
+- **Rank System** – Progress through 9 different ranks
+- **Usage Tracking** – Different XP rates for scanning, attacks, and utilities/misc
+- **Session Bonuses** – Extra XP for extended tool usage
+- **Level Display** – Current level shown on main menu, detailed stats accessible via RIGHT arrow
+- **Progress Persistence** – Level data saved to EEPROM, survives power cycles
+- **XP Reset** – Reset progress via Settings menu if desired
+
+Hit RIGHT in the main menu to check your stats. Level up by tinkering with RF signals and unlock ranks as you progress.
+
 ---
 
 ## 📟 Hardware
