@@ -29,7 +29,7 @@ static std::vector<FlipperZeroDeviceData> flipperZeroDevices;
 const int MAX_DEVICES = 100;
 const String FLIPPERZERO_MAC_PREFIX_1 = "80:e1:26";
 const String FLIPPERZERO_MAC_PREFIX_2 = "80:e1:27";
-const String FLIPPERZERO_MAC_PREFIX_2 = "0C:FA:22";
+const String FLIPPERZERO_MAC_PREFIX_3 = "0C:FA:22";
 
 int currentIndex = 0;
 int listStartIndex = 0;
