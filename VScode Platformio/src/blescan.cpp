@@ -37,51 +37,62 @@ static bool isScanning = false;
 static unsigned long lastScanTime = 0;
 const unsigned long scanInterval = 180000;
 
+static int callbackCount = 0;
+
 class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
   void onResult(BLEAdvertisedDevice advertisedDevice) override {
-    if (bleDevices.size() >= MAX_DEVICES) {
-      if (isScanning) {
+    callbackCount++;
+    
+    if (callbackCount > 500 || bleDevices.size() >= MAX_DEVICES) {
+      if (isScanning && pBLEScan) {
         pBLEScan->stop();
         isScanning = false;
       }
       return;
     }
 
-    std::string nameStd = advertisedDevice.getName();
-    const char *deviceName = nameStd.c_str();
-    std::string addrStd = advertisedDevice.getAddress().toString();
-    const char *deviceAddress = addrStd.c_str();
-    int8_t deviceRSSI = advertisedDevice.getRSSI();
-    bool hasName = advertisedDevice.haveName();
+    if (bleDevices.size() > 80 && callbackCount % 2 != 0) return;
 
-    for (auto &dev : bleDevices) {
-      if (strcmp(dev.address, deviceAddress) == 0) {
-        dev.rssi = deviceRSSI;
-        dev.lastSeen = millis();
-        if (hasName && deviceName[0]) {
-          strncpy(dev.name, deviceName, sizeof(dev.name) - 1);
-          dev.name[sizeof(dev.name) - 1] = '\0';
-          dev.hasName = true;
-        }
+    BLEAddress addr = advertisedDevice.getAddress();
+    String addrStr = addr.toString().c_str();
+    
+    if (addrStr.length() < 12) return;
+    
+    for (int i = 0; i < bleDevices.size(); i++) {
+      if (String(bleDevices[i].address) == addrStr) {
+        bleDevices[i].rssi = advertisedDevice.getRSSI();
+        bleDevices[i].lastSeen = millis();
+        
+        std::sort(bleDevices.begin(), bleDevices.end(),
+                  [](const BLEDeviceData &a, const BLEDeviceData &b) {
+                    return a.rssi > b.rssi;
+                  });
         return;
       }
     }
 
-    BLEDeviceData newDev;
-    memset(&newDev, 0, sizeof(newDev));
-    strncpy(newDev.address, deviceAddress, sizeof(newDev.address) - 1);
-    newDev.rssi = deviceRSSI;
+    BLEDeviceData newDev = {};
+    addrStr.toCharArray(newDev.address, 18);
+    newDev.rssi = advertisedDevice.getRSSI();
     newDev.lastSeen = millis();
-    if (hasName && deviceName[0]) {
-      strncpy(newDev.name, deviceName, sizeof(newDev.name) - 1);
-      newDev.name[sizeof(newDev.name) - 1] = '\0';
-      newDev.hasName = true;
-    } else {
-      strcpy(newDev.name, "Unknown");
-      newDev.hasName = false;
-    }
-    bleDevices.push_back(newDev);
+    
+    strcpy(newDev.name, "Unknown");
+    newDev.hasName = false;
 
+    if (advertisedDevice.haveName()) {
+      std::string nameStd = advertisedDevice.getName();
+      if (nameStd.length() > 0 && nameStd.length() < 32) {
+        strncpy(newDev.name, nameStd.c_str(), 31);
+        newDev.name[31] = '\0';
+        newDev.hasName = true;
+      }
+    }
+    
+    if (!newDev.hasName && advertisedDevice.haveServiceData()) {
+    }
+
+    bleDevices.push_back(newDev);
+    
     std::sort(bleDevices.begin(), bleDevices.end(),
               [](const BLEDeviceData &a, const BLEDeviceData &b) {
                 return a.rssi > b.rssi;
@@ -95,6 +106,7 @@ void blescanSetup() {
   isDetailView = false;
   lastButtonPress = 0;
   isScanning = false;
+  callbackCount = 0;
 
   u8g2.begin();
   u8g2.setFont(u8g2_font_6x10_tr);
@@ -107,8 +119,9 @@ void blescanSetup() {
   pBLEScan = BLEDevice::getScan();
   pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
   pBLEScan->setActiveScan(true);
-  pBLEScan->setInterval(100);
-  pBLEScan->setWindow(99);
+  pBLEScan->setInterval(1000);
+  pBLEScan->setWindow(200);
+  
   pBLEScan->start(5, false);
   isScanning = true;
   lastScanTime = millis();
@@ -122,12 +135,36 @@ void blescanSetup() {
 void blescanLoop() {
   unsigned long now = millis();
 
+  if (now - lastScanTime > 10000) {
+    callbackCount = 0;
+  }
+
   if (isScanning && now - lastScanTime > 5000) {
     pBLEScan->stop();
     isScanning = false;
+    callbackCount = 0;
     lastScanTime = now;
-  } else if (!isScanning && now - lastScanTime > scanInterval) {
-    bleDevices.clear();
+  } 
+  else if (!isScanning && now - lastScanTime > scanInterval) {
+    if (bleDevices.size() >= MAX_DEVICES) {
+      std::sort(bleDevices.begin(), bleDevices.end(),
+                [](const BLEDeviceData &a, const BLEDeviceData &b) {
+                  if (a.lastSeen != b.lastSeen) {
+                    return a.lastSeen < b.lastSeen;
+                  }
+                  return a.rssi < b.rssi;
+                });
+      
+      int devicesToRemove = MAX_DEVICES / 4;
+      if (devicesToRemove > 0) {
+        bleDevices.erase(bleDevices.begin(), 
+                        bleDevices.begin() + devicesToRemove);
+      }
+      
+      currentIndex = listStartIndex = 0;
+    }
+    
+    callbackCount = 0;
     pBLEScan->start(5, false);
     isScanning = true;
     lastScanTime = now;
@@ -210,8 +247,8 @@ void blescanLoop() {
       if (idx == currentIndex)
         u8g2.drawStr(0, 20 + i * 10, ">");
       char line[32];
-      snprintf(line, sizeof(line), "%.8s | RSSI %d",
-               d.name[0] ? d.name : "Unknown", d.rssi);
+      const char* displayName = d.hasName && d.name[0] ? d.name : "Unknown";
+      snprintf(line, sizeof(line), "%.8s | RSSI %d", displayName, d.rssi);
       u8g2.drawStr(10, 20 + i * 10, line);
     }
   }

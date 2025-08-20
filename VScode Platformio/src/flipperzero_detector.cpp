@@ -42,62 +42,79 @@ static bool isScanning = false;
 static unsigned long lastScanTime = 0;
 const unsigned long scanInterval = 30000;
 
+static int flipperCallbackCount = 0;
+
 class MyFlipperAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
   void onResult(BLEAdvertisedDevice advertisedDevice) override {
-    if (flipperZeroDevices.size() >= MAX_DEVICES) {
-      if (isScanning) {
+    flipperCallbackCount++;
+    
+    if (flipperCallbackCount > 500 || flipperZeroDevices.size() >= MAX_DEVICES) {
+      if (isScanning && pBLEScan) {
         pBLEScan->stop();
         isScanning = false;
       }
       return;
     }
 
-    std::string nameStd = advertisedDevice.getName();
-    const char *deviceName = nameStd.c_str();
-    std::string addrStd = advertisedDevice.getAddress().toString();
-    const char *deviceAddress = addrStd.c_str();
-    int8_t deviceRSSI = advertisedDevice.getRSSI();
-    bool hasName = advertisedDevice.haveName();
+    if (flipperZeroDevices.size() > 80 && flipperCallbackCount % 2 != 0) return;
 
-    String macAddress = String(deviceAddress);
-    bool isFlipperZero = macAddress.startsWith(FLIPPERZERO_MAC_PREFIX_1) ||
-                     macAddress.startsWith(FLIPPERZERO_MAC_PREFIX_2) ||
-                     macAddress.startsWith(FLIPPERZERO_MAC_PREFIX_3);
-
-    for (auto &dev : flipperZeroDevices) {
-      if (strcmp(dev.address, deviceAddress) == 0) {
-        dev.rssi = deviceRSSI;
-        dev.lastSeen = millis();
-        if (hasName && deviceName[0]) {
-          strncpy(dev.name, deviceName, sizeof(dev.name) - 1);
-          dev.name[sizeof(dev.name) - 1] = '\0';
-          dev.hasName = true;
-        }
-        return;
-      }
-    }
-
+    BLEAddress addr = advertisedDevice.getAddress();
+    String addrStr = addr.toString().c_str();
+    
+    if (addrStr.length() < 12) return;
+    
+    bool isFlipperZero = addrStr.startsWith(FLIPPERZERO_MAC_PREFIX_1) ||
+                         addrStr.startsWith(FLIPPERZERO_MAC_PREFIX_2) ||
+                         addrStr.startsWith(FLIPPERZERO_MAC_PREFIX_3);
+    
     if (!isFlipperZero) {
       return;
     }
 
-    FlipperZeroDeviceData newDev;
-    memset(&newDev, 0, sizeof(newDev));
-    strncpy(newDev.address, deviceAddress, sizeof(newDev.address) - 1);
+    int8_t deviceRSSI = advertisedDevice.getRSSI();
+
+    for (int i = 0; i < flipperZeroDevices.size(); i++) {
+      if (String(flipperZeroDevices[i].address) == addrStr) {
+        flipperZeroDevices[i].rssi = deviceRSSI;
+        flipperZeroDevices[i].lastSeen = millis();
+        
+        if (!flipperZeroDevices[i].hasName && advertisedDevice.haveName()) {
+          std::string nameStd = advertisedDevice.getName();
+          if (nameStd.length() > 0 && nameStd.length() < 32) {
+            strncpy(flipperZeroDevices[i].name, nameStd.c_str(), 31);
+            flipperZeroDevices[i].name[31] = '\0';
+            flipperZeroDevices[i].hasName = true;
+          }
+        }
+        
+        std::sort(flipperZeroDevices.begin(), flipperZeroDevices.end(),
+                  [](const FlipperZeroDeviceData &a, const FlipperZeroDeviceData &b) {
+                    return a.rssi > b.rssi;
+                  });
+        return;
+      }
+    }
+
+    FlipperZeroDeviceData newDev = {};
+    addrStr.toCharArray(newDev.address, 18);
     newDev.rssi = deviceRSSI;
     newDev.lastSeen = millis();
     newDev.isFlipperZero = true;
+    
+    strcpy(newDev.name, "Flipper Zero");
+    newDev.hasName = false;
 
-    if (hasName && deviceName[0]) {
-      strncpy(newDev.name, deviceName, sizeof(newDev.name) - 1);
-      newDev.name[sizeof(newDev.name) - 1] = '\0';
-      newDev.hasName = true;
-    } else {
-      strcpy(newDev.name, "Flipper Zero");
-      newDev.hasName = false;
+    if (advertisedDevice.haveName()) {
+      std::string nameStd = advertisedDevice.getName();
+      if (nameStd.length() > 0 && nameStd.length() < 32) {
+        strncpy(newDev.name, nameStd.c_str(), 31);
+        newDev.name[31] = '\0';
+        newDev.hasName = true;
+      }
     }
-    flipperZeroDevices.push_back(newDev);
 
+    flipperZeroDevices.push_back(newDev);
+    
     std::sort(flipperZeroDevices.begin(), flipperZeroDevices.end(),
               [](const FlipperZeroDeviceData &a, const FlipperZeroDeviceData &b) {
                 return a.rssi > b.rssi;
@@ -111,6 +128,7 @@ void flipperZeroDetectorSetup() {
   isDetailView = false;
   lastButtonPress = 0;
   isScanning = false;
+  flipperCallbackCount = 0;
 
   u8g2.begin();
   u8g2.setFont(u8g2_font_6x10_tr);
@@ -121,11 +139,11 @@ void flipperZeroDetectorSetup() {
 
   BLEDevice::init("FlipperZeroDetector");
   pBLEScan = BLEDevice::getScan();
-  pBLEScan->setAdvertisedDeviceCallbacks(
-      new MyFlipperAdvertisedDeviceCallbacks());
+  pBLEScan->setAdvertisedDeviceCallbacks(new MyFlipperAdvertisedDeviceCallbacks());
   pBLEScan->setActiveScan(true);
-  pBLEScan->setInterval(100);
-  pBLEScan->setWindow(99);
+  pBLEScan->setInterval(1000);
+  pBLEScan->setWindow(200);
+  
   pBLEScan->start(5, false);
   isScanning = true;
   lastScanTime = millis();
@@ -140,11 +158,17 @@ void flipperZeroDetectorSetup() {
 void flipperZeroDetectorLoop() {
   unsigned long now = millis();
 
+  if (now - lastScanTime > 10000) {
+    flipperCallbackCount = 0;
+  }
+
   if (isScanning && now - lastScanTime > 5000) {
     pBLEScan->stop();
     isScanning = false;
+    flipperCallbackCount = 0;
     lastScanTime = now;
-  } else if (!isScanning && now - lastScanTime > scanInterval) {
+  } 
+  else if (!isScanning && now - lastScanTime > scanInterval) {
     if (flipperZeroDevices.size() >= MAX_DEVICES) {
       std::sort(flipperZeroDevices.begin(), flipperZeroDevices.end(),
                 [](const FlipperZeroDeviceData &a, const FlipperZeroDeviceData &b) {
@@ -159,8 +183,11 @@ void flipperZeroDetectorLoop() {
         flipperZeroDevices.erase(flipperZeroDevices.begin(), 
                                 flipperZeroDevices.begin() + devicesToRemove);
       }
+      
+      currentIndex = listStartIndex = 0;
     }
     
+    flipperCallbackCount = 0;
     pBLEScan->start(5, false);
     isScanning = true;
     lastScanTime = now;
