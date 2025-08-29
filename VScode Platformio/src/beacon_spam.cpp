@@ -31,7 +31,7 @@ const char ssids[] PROGMEM = {
   "Subscribe to TalkingSasquach\n"
   "jbohack was here\n"
   "zr_crackiin was here\n"
-  "defcon.lullaby.cafe\n"
+  "nyandevices.com\n"
   "LAN Solo\n"
   "The LAN Before Time\n"
   "Silence of the LANs\n"

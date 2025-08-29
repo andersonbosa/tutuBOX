@@ -75,7 +75,7 @@ void aboutLoop() {
   u8g2.print(title);
 
   u8g2.setFont(u8g2_font_helvR08_tr);
-  const char* url = "nyanBOX.lullaby.cafe";
+  const char* url = "nyandevices.com";
   int16_t urlW = u8g2.getUTF8Width(url);
   u8g2.setCursor((128 - urlW) / 2, 32);
   u8g2.print(url);

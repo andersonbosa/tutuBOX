@@ -32,7 +32,7 @@ static esp_ble_adv_params_t adv_params = {
 static const char* customNames[] = {
     "zr_crackin was here",
     "jbohack was here",
-    "defcon.lullaby.cafe",
+    "nyandevices.com",
     "Sub2TalkingSasquach",
     "nyanBOX",
     "Crypto Wallet",

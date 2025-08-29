@@ -54,7 +54,7 @@ const char* faces[] = {
 // Pwnagotchi names
 const char* names[] = {
     "nyanBOX!~",
-    "nyanbox.lullaby.cafe",
+    "nyandevices.com",
     "jbohack was here",
     "zRCrackiin was here",
     "Sub to TalkingSasquach",

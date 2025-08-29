@@ -22,7 +22,7 @@
   </p>
 
   <p>
-    <a href="https://defcon.lullaby.cafe">Website</a> ·
+    <a href="https://nyandevices.com">Website</a> ·
     <a href="https://discord.gg/J5A3zDC2y8">Discord</a> ·
     <a href="https://github.com/cifertech/nrfbox">Original Project</a>
   </p>
