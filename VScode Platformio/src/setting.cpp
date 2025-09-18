@@ -21,7 +21,7 @@ extern U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2;
 
 int currentSetting = 0;
 int totalSettings = 4;
-bool neoPixelActive = false;
+bool neoPixelActive = true;
 uint8_t oledBrightness = 100;
 extern bool dangerousActionsEnabled;
 bool showResetConfirm = false;
@@ -45,7 +45,13 @@ void settingSetup() {
   uint8_t neoPixelValue = EEPROM.read(EEPROM_ADDRESS_NEOPIXEL);
   uint8_t brightnessValue = EEPROM.read(EEPROM_ADDRESS_BRIGHTNESS);
 
-  neoPixelActive = (neoPixelValue == 1);
+  if (neoPixelValue == 0xFF) {
+    neoPixelActive = true;
+    EEPROM.write(EEPROM_ADDRESS_NEOPIXEL, 1);
+    EEPROM.commit();
+  } else {
+    neoPixelActive = (neoPixelValue == 1);
+  }
 
   if (brightnessValue > 255) {
     oledBrightness = 128;
