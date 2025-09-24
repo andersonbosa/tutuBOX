@@ -71,6 +71,7 @@ The device combines the ESP32 Wroom32U, NRF24 modules, an OLED display, and othe
 - **BLE Scanner** – Detects nearby BLE devices
 - **nyanBOX Detector** – Discovers nearby nyanBOX devices and displays their information including level, version, and signal strength.
 - **Flipper Scanner** – Detects nearby Flipper Zero devices
+- **AirTag Detector** – Scans for and identifies nearby Apple AirTag devices.
 - **BLE Spammer** – Broadcasts BLE advertisement packets for testing
 - **BLE Jammer** – Disrupts BLE device communication
 - **Sour Apple** – Mimics Apple Bluetooth signals like AirPods pairing pop-up to test device resilience against protocol exploits.
@@ -191,6 +192,7 @@ If you find nyanBox useful, please consider supporting the project:
 - [AppleJuice](https://github.com/ECTO-1A/AppleJuice)
 - [ESP32-Sour-Apple](https://github.com/RapierXbox/ESP32-Sour-Apple)
 - [PwnGridSpam](https://github.com/7h30th3r0n3/PwnGridSpam)
+- [ESP32-AirTag-Scanner](https://github.com/MatthewKuKanich/ESP32-AirTag-Scanner)
 - [Original nRFBOX Project](https://github.com/cifertech/nrfbox)
 
 ### Community

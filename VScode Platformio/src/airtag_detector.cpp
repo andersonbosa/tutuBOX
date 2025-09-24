@@ -1,0 +1,296 @@
+/* ____________________________
+   This software is licensed under the MIT License:
+   https://github.com/jbohack/nyanBOX
+   ________________________________________
+*/
+
+#include "../include/airtag_detector.h"
+#include "../include/sleep_manager.h"
+
+extern U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2;
+
+#define BTN_UP BUTTON_PIN_UP
+#define BTN_DOWN BUTTON_PIN_DOWN
+#define BTN_RIGHT BUTTON_PIN_RIGHT
+#define BTN_BACK BUTTON_PIN_LEFT
+#define BTN_CENTER BUTTON_PIN_CENTER
+
+struct AirTagDeviceData {
+  char name[32];
+  char address[18];
+  int8_t rssi;
+  unsigned long lastSeen;
+  uint8_t payload[64];
+  size_t payloadLength;
+  bool isAirTag;
+};
+
+static std::vector<AirTagDeviceData> airtagDevices;
+const int MAX_DEVICES = 100;
+
+int currentIndex = 0;
+int listStartIndex = 0;
+bool isDetailView = false;
+unsigned long lastButtonPress = 0;
+const unsigned long debounceTime = 200;
+
+static BLEScan *pBLEScan;
+static bool isScanning = false;
+static unsigned long lastScanTime = 0;
+const unsigned long scanInterval = 30000;
+
+static int airtagCallbackCount = 0;
+
+class MyAirTagAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
+  void onResult(BLEAdvertisedDevice advertisedDevice) override {
+    airtagCallbackCount++;
+
+    if (airtagCallbackCount > 500 || airtagDevices.size() >= MAX_DEVICES) {
+      if (isScanning && pBLEScan) {
+        pBLEScan->stop();
+        isScanning = false;
+      }
+      return;
+    }
+
+    if (airtagDevices.size() > 80 && airtagCallbackCount % 2 != 0) return;
+
+    uint8_t* payLoad = advertisedDevice.getPayload();
+    size_t payLoadLength = advertisedDevice.getPayloadLength();
+
+    // Check common AirTag patterns - "1E FF 4C 00" and "4C 00 12 19"
+    bool isAirTag = false;
+    for (int i = 0; i <= payLoadLength - 4; i++) {
+      if (payLoad[i] == 0x1E && payLoad[i+1] == 0xFF && payLoad[i+2] == 0x4C && payLoad[i+3] == 0x00) {
+        isAirTag = true;
+        break;
+      }
+      if (payLoad[i] == 0x4C && payLoad[i+1] == 0x00 && payLoad[i+2] == 0x12 && payLoad[i+3] == 0x19) {
+        isAirTag = true;
+        break;
+      }
+    }
+
+    if (!isAirTag) {
+      return;
+    }
+
+    BLEAddress addr = advertisedDevice.getAddress();
+    String addrStr = addr.toString().c_str();
+    addrStr.toUpperCase();
+
+    if (addrStr.length() < 12) return;
+
+    int8_t deviceRSSI = advertisedDevice.getRSSI();
+
+    for (int i = 0; i < airtagDevices.size(); i++) {
+      if (String(airtagDevices[i].address) == addrStr) {
+        airtagDevices[i].rssi = deviceRSSI;
+        airtagDevices[i].lastSeen = millis();
+
+        if (payLoadLength > 0 && payLoadLength < 64) {
+          memcpy(airtagDevices[i].payload, payLoad, payLoadLength);
+          airtagDevices[i].payloadLength = payLoadLength;
+        }
+
+        std::sort(airtagDevices.begin(), airtagDevices.end(),
+                  [](const AirTagDeviceData &a, const AirTagDeviceData &b) {
+                    return a.rssi > b.rssi;
+                  });
+        return;
+      }
+    }
+
+    AirTagDeviceData newDev = {};
+    addrStr.toCharArray(newDev.address, 18);
+    newDev.rssi = deviceRSSI;
+    newDev.lastSeen = millis();
+    newDev.isAirTag = true;
+
+    strcpy(newDev.name, "AirTag");
+
+    if (payLoadLength > 0 && payLoadLength < 64) {
+      memcpy(newDev.payload, payLoad, payLoadLength);
+      newDev.payloadLength = payLoadLength;
+    }
+
+    if (advertisedDevice.haveName()) {
+      std::string nameStd = advertisedDevice.getName();
+      if (nameStd.length() > 0 && nameStd.length() < 32) {
+        strncpy(newDev.name, nameStd.c_str(), 31);
+        newDev.name[31] = '\0';
+      }
+    }
+
+    airtagDevices.push_back(newDev);
+
+    std::sort(airtagDevices.begin(), airtagDevices.end(),
+              [](const AirTagDeviceData &a, const AirTagDeviceData &b) {
+                return a.rssi > b.rssi;
+              });
+  }
+};
+
+void airtagDetectorSetup() {
+  airtagDevices.clear();
+  currentIndex = listStartIndex = 0;
+  isDetailView = false;
+  lastButtonPress = 0;
+  isScanning = false;
+  airtagCallbackCount = 0;
+
+  u8g2.begin();
+  u8g2.setFont(u8g2_font_6x10_tr);
+  u8g2.clearBuffer();
+  u8g2.drawStr(0, 10, "Scanning for");
+  u8g2.drawStr(0, 20, "AirTags...");
+  u8g2.sendBuffer();
+
+  BLEDevice::init("AirTagDetector");
+  pBLEScan = BLEDevice::getScan();
+  pBLEScan->setAdvertisedDeviceCallbacks(new MyAirTagAdvertisedDeviceCallbacks());
+  pBLEScan->setActiveScan(true);
+  pBLEScan->setInterval(100);
+  pBLEScan->setWindow(99);
+
+  pBLEScan->start(5, false);
+  isScanning = true;
+  lastScanTime = millis();
+
+  pinMode(BTN_UP, INPUT_PULLUP);
+  pinMode(BTN_DOWN, INPUT_PULLUP);
+  pinMode(BTN_RIGHT, INPUT_PULLUP);
+  pinMode(BTN_BACK, INPUT_PULLUP);
+  pinMode(BTN_CENTER, INPUT_PULLUP);
+}
+
+void airtagDetectorLoop() {
+  unsigned long now = millis();
+
+  if (now - lastScanTime > 10000) {
+    airtagCallbackCount = 0;
+  }
+
+  if (isScanning && now - lastScanTime > 5000) {
+    pBLEScan->stop();
+    isScanning = false;
+    airtagCallbackCount = 0;
+    lastScanTime = now;
+  }
+  else if (!isScanning && now - lastScanTime > scanInterval) {
+    if (airtagDevices.size() >= MAX_DEVICES) {
+      std::sort(airtagDevices.begin(), airtagDevices.end(),
+                [](const AirTagDeviceData &a, const AirTagDeviceData &b) {
+                  if (a.lastSeen != b.lastSeen) {
+                    return a.lastSeen < b.lastSeen;
+                  }
+                  return a.rssi < b.rssi;
+                });
+
+      int devicesToRemove = MAX_DEVICES / 4;
+      if (devicesToRemove > 0) {
+        airtagDevices.erase(airtagDevices.begin(),
+                           airtagDevices.begin() + devicesToRemove);
+      }
+
+      currentIndex = listStartIndex = 0;
+    }
+
+    airtagCallbackCount = 0;
+    pBLEScan->start(5, false);
+    isScanning = true;
+    lastScanTime = now;
+  }
+
+  static bool showingRefresh = false;
+  if (!isScanning && now - lastScanTime > scanInterval - 1000) {
+    showingRefresh = true;
+  } else if (isScanning && showingRefresh) {
+    showingRefresh = false;
+  }
+
+  if (now - lastButtonPress > debounceTime) {
+    if (!isDetailView && digitalRead(BTN_UP) == LOW && currentIndex > 0) {
+      --currentIndex;
+      if (currentIndex < listStartIndex)
+        --listStartIndex;
+      updateLastActivity();
+      lastButtonPress = now;
+    } else if (!isDetailView && digitalRead(BTN_DOWN) == LOW &&
+               currentIndex < (int)airtagDevices.size() - 1) {
+      ++currentIndex;
+      if (currentIndex >= listStartIndex + 5)
+        ++listStartIndex;
+      updateLastActivity();
+      lastButtonPress = now;
+    } else if (!isDetailView && digitalRead(BTN_RIGHT) == LOW &&
+               !airtagDevices.empty()) {
+      isDetailView = true;
+      updateLastActivity();
+      lastButtonPress = now;
+    } else if (digitalRead(BTN_BACK) == LOW) {
+      isDetailView = false;
+      updateLastActivity();
+      lastButtonPress = now;
+    } else if (digitalRead(BTN_CENTER) == LOW) {
+      updateLastActivity();
+      lastButtonPress = now;
+      return;
+    }
+  }
+
+  if (airtagDevices.empty()) {
+    currentIndex = listStartIndex = 0;
+    isDetailView = false;
+  } else {
+    currentIndex = constrain(currentIndex, 0, (int)airtagDevices.size() - 1);
+    listStartIndex = constrain(listStartIndex, 0, max(0, (int)airtagDevices.size() - 5));
+  }
+
+  u8g2.clearBuffer();
+  if (showingRefresh) {
+    u8g2.drawStr(0, 10, "Refreshing");
+    u8g2.drawStr(0, 20, "AirTags...");
+    u8g2.sendBuffer();
+  } else if (airtagDevices.empty()) {
+    u8g2.drawStr(0, 10, "Scanning for");
+    u8g2.drawStr(0, 20, "AirTags...");
+    u8g2.drawStr(0, 35, "Nearby: n/a");
+    u8g2.drawStr(0, 50, "Press CENTER to exit");
+  } else if (isDetailView) {
+    auto &dev = airtagDevices[currentIndex];
+    u8g2.setFont(u8g2_font_5x8_tr);
+    char buf[32];
+    snprintf(buf, sizeof(buf), "Name: %s", dev.name);
+    u8g2.drawStr(0, 10, buf);
+    snprintf(buf, sizeof(buf), "Addr: %s", dev.address);
+    u8g2.drawStr(0, 20, buf);
+    snprintf(buf, sizeof(buf), "RSSI: %d dBm", dev.rssi);
+    u8g2.drawStr(0, 30, buf);
+    snprintf(buf, sizeof(buf), "Payload: %d bytes", dev.payloadLength);
+    u8g2.drawStr(0, 40, buf);
+    snprintf(buf, sizeof(buf), "Age: %lus", (millis() - dev.lastSeen) / 1000);
+    u8g2.drawStr(0, 50, buf);
+    u8g2.drawStr(0, 62, "L=Back C=Exit");
+  } else {
+    u8g2.setFont(u8g2_font_6x10_tr);
+    char header[32];
+    snprintf(header, sizeof(header), "AirTags: %d/%d",
+             (int)airtagDevices.size(), MAX_DEVICES);
+    u8g2.drawStr(0, 10, header);
+
+    for (int i = 0; i < 5; ++i) {
+      int idx = listStartIndex + i;
+      if (idx >= (int)airtagDevices.size())
+        break;
+      auto &d = airtagDevices[idx];
+      if (idx == currentIndex)
+        u8g2.drawStr(0, 20 + i * 10, ">");
+      char line[32];
+      snprintf(line, sizeof(line), "%.8s | RSSI %d",
+               d.name, d.rssi);
+      u8g2.drawStr(10, 20 + i * 10, line);
+    }
+  }
+  u8g2.sendBuffer();
+}
