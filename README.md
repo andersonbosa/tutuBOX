@@ -72,6 +72,7 @@ The device combines the ESP32 Wroom32U, NRF24 modules, an OLED display, and othe
 - **nyanBOX Detector** – Discovers nearby nyanBOX devices and displays their information including level, version, and signal strength.
 - **Flipper Scanner** – Detects nearby Flipper Zero devices
 - **AirTag Detector** – Scans for and identifies nearby Apple AirTag devices.
+- **AirTag Spoofer** – Clones and rebroadcasts detected Apple AirTag devices for selective or bulk spoofing.
 - **BLE Spammer** – Broadcasts BLE advertisement packets for testing
 - **BLE Jammer** – Disrupts BLE device communication
 - **Sour Apple** – Mimics Apple Bluetooth signals like AirPods pairing pop-up to test device resilience against protocol exploits.

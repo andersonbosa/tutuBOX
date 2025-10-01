@@ -30,6 +30,7 @@
 #include "../include/ble_spammer.h"
 #include "../include/flipperzero_detector.h"
 #include "../include/airtag_detector.h"
+#include "../include/airtag_spoofer.h"
 #include "../include/wifiscan.h"
 #include "../include/deauth.h"
 #include "../include/deauth_scanner.h"
@@ -330,6 +331,7 @@ MenuItem bleMenu[] = {
   { "nyanBOX Detector", nullptr, nyanboxDetectorSetup,         nyanboxDetectorLoop,         cleanupBLE },
   { "Flipper Zero Detector", nullptr, flipperZeroDetectorSetup, flipperZeroDetectorLoop, cleanupBLE },
   { "AirTag Detector", nullptr, airtagDetectorSetup,   airtagDetectorLoop,      cleanupBLE },
+  { "AirTag Spoofer", nullptr, airtagSpooferSetup,     airtagSpooferLoop,       cleanupBLE },
   { "BLE Spammer",  nullptr, bleSpamSetup,             bleSpamLoop,             cleanupBLE },
   { "BLE Jammer",   nullptr, blejammerSetup,           blejammerLoop,           cleanupRadio },
   { "Sour Apple",   nullptr, sourappleSetup,           sourappleLoop,           cleanupBLE },

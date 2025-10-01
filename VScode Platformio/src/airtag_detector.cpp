@@ -15,17 +15,7 @@ extern U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2;
 #define BTN_BACK BUTTON_PIN_LEFT
 #define BTN_CENTER BUTTON_PIN_CENTER
 
-struct AirTagDeviceData {
-  char name[32];
-  char address[18];
-  int8_t rssi;
-  unsigned long lastSeen;
-  uint8_t payload[64];
-  size_t payloadLength;
-  bool isAirTag;
-};
-
-static std::vector<AirTagDeviceData> airtagDevices;
+std::vector<AirTagDeviceData> airtagDevices;
 const int MAX_DEVICES = 100;
 
 int currentIndex = 0;
