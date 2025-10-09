@@ -358,7 +358,7 @@ MenuItem otherMenu[] = {
   { "Scanner",      nullptr, scannerSetup,    scannerLoop,    cleanupRadio },
   { "Analyzer",     nullptr, analyzerSetup,   analyzerLoop,   cleanupRadio },
   { "Setting",      nullptr, settingSetup,    settingLoop,    noCleanup },
-  { "About",        nullptr, aboutSetup,      aboutLoop,      noCleanup },
+  { "About",        nullptr, aboutSetup,      aboutLoop,      aboutCleanup },
   { "Back",         nullptr, nullptr,         nullptr,        noCleanup }
 };
 constexpr int OTHER_MENU_SIZE = sizeof(otherMenu) / sizeof(otherMenu[0]);

@@ -5,11 +5,15 @@
 
 #include <Arduino.h>
 #include <U8g2lib.h>
+#include <EEPROM.h>
 #include "snake.h"
 #include "../include/sleep_manager.h"
 #include <esp_system.h>
 
 extern U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2;
+
+#define EEPROM_ADDRESS_HIGHSCORE_LOW 103
+#define EEPROM_ADDRESS_HIGHSCORE_HIGH 104
 
 static uint8_t snakeX[SNAKE_MAX];
 static uint8_t snakeY[SNAKE_MAX];
@@ -20,9 +24,32 @@ static unsigned long lastMove;
 static const unsigned long INTERVAL = 200;
 static uint16_t score = 0;
 static uint16_t highScore = 0;
+static uint16_t savedHighScore = 0;
 
-void snakeSetup(){
-  randomSeed((uint32_t)esp_random());
+void loadHighScore() {
+  uint8_t scoreLow = EEPROM.read(EEPROM_ADDRESS_HIGHSCORE_LOW);
+  uint8_t scoreHigh = EEPROM.read(EEPROM_ADDRESS_HIGHSCORE_HIGH);
+  uint16_t loadedScore = (scoreHigh << 8) | scoreLow;
+
+  if (loadedScore == 0xFFFF || loadedScore > 512) {
+    highScore = 0;
+    savedHighScore = 0;
+  } else {
+    highScore = loadedScore;
+    savedHighScore = loadedScore;
+  }
+}
+
+void saveHighScore() {
+  if (highScore > savedHighScore && highScore <= 512) {
+    EEPROM.write(EEPROM_ADDRESS_HIGHSCORE_LOW, highScore & 0xFF);
+    EEPROM.write(EEPROM_ADDRESS_HIGHSCORE_HIGH, (highScore >> 8) & 0xFF);
+    EEPROM.commit();
+    savedHighScore = highScore;
+  }
+}
+
+void resetSnake(){
   snakeLen = 3;
   score = 0;
   snakeX[0] = SNAKE_COLS/2; snakeY[0] = SNAKE_ROWS/2;
@@ -32,6 +59,12 @@ void snakeSetup(){
   appleX = random(SNAKE_COLS);
   appleY = random(SNAKE_ROWS);
   lastMove = millis();
+}
+
+void snakeSetup(){
+  randomSeed((uint32_t)esp_random());
+  loadHighScore();
+  resetSnake();
 }
 
 void snakeLoop(){
@@ -62,13 +95,18 @@ void snakeLoop(){
     }
     for(int i=1; i<snakeLen; i++){
       if(snakeX[i]==snakeX[0] && snakeY[i]==snakeY[0]){
-        snakeSetup();
+        if(score > highScore) {
+          highScore = score;
+        }
+        resetSnake();
         return;
       }
     }
     if(snakeX[0]==appleX && snakeY[0]==appleY){
       score++;
-      if(score>highScore) highScore = score;
+      if(score>highScore) {
+        highScore = score;
+      }
       if(snakeLen < SNAKE_MAX-1) snakeLen++;
       appleX = random(SNAKE_COLS);
       appleY = random(SNAKE_ROWS);
@@ -84,6 +122,10 @@ void snakeLoop(){
     u8g2.drawFrame(snakeX[i]*SNAKE_CELL, snakeY[i]*SNAKE_CELL, SNAKE_CELL, SNAKE_CELL);
   }
   u8g2.sendBuffer();
+}
+
+void snakeCleanup() {
+  saveHighScore();
 }
 
 void setup(){

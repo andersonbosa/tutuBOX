@@ -92,3 +92,9 @@ void aboutLoop() {
 
   u8g2.sendBuffer();
 }
+
+void aboutCleanup() {
+  if (snakeMode) {
+    snakeCleanup();
+  }
+}

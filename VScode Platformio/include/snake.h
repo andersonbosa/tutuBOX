@@ -17,5 +17,6 @@
 
 void snakeSetup();
 void snakeLoop();
+void snakeCleanup();
 
 #endif
