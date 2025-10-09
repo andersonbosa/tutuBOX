@@ -298,7 +298,9 @@ void runApp(MenuItem &mi);
 
 void cleanupWiFi() {
   esp_wifi_stop();
+  delay(50);
   esp_wifi_start();
+  delay(50);
 }
 
 void cleanupRadio() {
@@ -312,7 +314,9 @@ void cleanupRadio() {
 
 void cleanupBLE() {
   esp_ble_gap_stop_advertising();
+  delay(50);
   BLEDevice::deinit();
+  delay(50);
 }
 
 void noCleanup() {
