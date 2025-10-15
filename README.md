@@ -71,6 +71,7 @@ The device combines the ESP32 Wroom32U, NRF24 modules, an OLED display, and othe
 - **BLE Scanner** – Detects nearby BLE devices
 - **nyanBOX Detector** – Discovers nearby nyanBOX devices and displays their information including level, version, and signal strength.
 - **Flipper Scanner** – Detects nearby Flipper Zero devices
+- **Skimmer Detector** – Detects HC-03, HC-05, and HC-06 Bluetooth modules commonly used in credit card skimming devices.
 - **AirTag Detector** – Scans for and identifies nearby Apple AirTag devices.
 - **AirTag Spoofer** – Clones and rebroadcasts detected Apple AirTag devices for selective or bulk spoofing.
 - **BLE Spammer** – Broadcasts BLE advertisement packets for testing
