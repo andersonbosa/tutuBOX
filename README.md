@@ -45,7 +45,7 @@ nyanBOX is a fork of the original nRFBOX project by CiferTech, now maintained by
 
 nyanBOX is a wireless toolkit designed to explore, analyze, and interact with various wireless communication protocols. Based on the original nRFBOX by CiferTech, this fork retains all the powerful features while introducing new improvements and providing ongoing maintenance.
 
-The device combines the ESP32 Wroom32U, NRF24 modules, an OLED display, and other components to create a multifunctional device that can act as a scanner, analyzer, jammer, BLE jammer, BLE spoofer, and perform advanced tasks such as the "Sour Apple" attack.
+The device combines the ESP32 Wroom32U, NRF24 modules, an OLED display, and other components to create a multifunctional device for WiFi and Bluetooth security research, network analysis, RF signal monitoring, and wireless protocol testing.
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/530e5686-09db-4f02-aabe-80a8abcbb036" alt="nyanBOX Interface" width="650" />
@@ -54,7 +54,7 @@ The device combines the ESP32 Wroom32U, NRF24 modules, an OLED display, and othe
 
 ## 🎯 Features
 
-> **⚠️ Note:** Some advanced jamming applications require enabling "Dangerous Actions" in the Settings menu and accepting a legal agreement before use.
+> **⚠️ Note:** Additional advanced applications can be enabled in the Settings menu.
 
 ### 📶 WiFi Tools
 - **WiFi Scanner** – Detects nearby WiFi access points
@@ -65,7 +65,6 @@ The device combines the ESP32 Wroom32U, NRF24 modules, an OLED display, and othe
 - **Evil Portal** – Creates captive portal with multiple templates (Generic, Facebook, Google) that automatically scans nearby networks for realistic SSID spoofing and credential capture.
 - **Pwnagotchi Detector** – Detects nearby Pwnagotchi devices and displays their information
 - **Pwnagotchi Spam** - Pwnagotchi grid flooding tool that generates fake beacon frames with randomized identities, faces, names, and versions (contains optional DoS mode).
-- **WLAN Jammer** – Jams wireless communication on selected channels
 
 ### 🔵 Bluetooth (BLE) Tools
 - **BLE Scanner** – Detects nearby BLE devices
@@ -76,12 +75,10 @@ The device combines the ESP32 Wroom32U, NRF24 modules, an OLED display, and othe
 - **AirTag Detector** – Scans for and identifies nearby Apple AirTag devices.
 - **AirTag Spoofer** – Clones and rebroadcasts detected Apple AirTag devices for selective or bulk spoofing.
 - **BLE Spammer** – Broadcasts BLE advertisement packets for testing
-- **BLE Jammer** – Disrupts BLE device communication
 - **Sour Apple** – Mimics Apple Bluetooth signals like AirPods pairing pop-up to test device resilience against protocol exploits.
 - **BLE Spoofer** – Simulates BLE devices for testing and research
 
 ### 📡 Signal & Protocol Tools
-- **Proto Kill Mode** – Advanced tool for disrupting various wireless protocols
 - **Scanner** – Scans the 2.4GHz frequency band to detect active channels and devices
 - **Analyzer** – Analyzes detected signals and provides detailed activity information
 
@@ -170,7 +167,7 @@ It is the sole responsibility of the user to ensure compliance with all applicab
 
 ### 📌 Important Notes
 
-- Unauthorized scanning, jamming, or interference with wireless communications may be **illegal** in your jurisdiction.  
+- Unauthorized scanning, signal manipulation, or interference with wireless communications may be **illegal** in your jurisdiction.  
 - Always obtain **explicit permission** before testing on networks or devices you do not own.  
 - Certain features may be **restricted or prohibited** in some countries or regions.  
 - The developers assume **no liability** for any damages, legal consequences, or misuse resulting from this project.
