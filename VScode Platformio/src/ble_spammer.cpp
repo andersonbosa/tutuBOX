@@ -167,6 +167,21 @@ static void drawBleSpamMenu() {
     u8g2.drawStr(0, 62, "U/D=Move R=Start SEL=Exit");
     u8g2.sendBuffer();
 }
+
+static void drawActiveSpam(const char* modeName, const char* extraInfo = nullptr) {
+    u8g2.clearBuffer();
+    u8g2.setFont(u8g2_font_6x10_tr);
+    u8g2.drawStr(0, 12, modeName);
+    if (extraInfo) {
+        u8g2.drawStr(0, 28, extraInfo);
+        u8g2.drawStr(0, 44, "Status: Active");
+    } else {
+        u8g2.drawStr(0, 28, "Status: Active");
+    }
+    u8g2.setFont(u8g2_font_5x8_tr);
+    u8g2.drawStr(0, 62, "L=Back SEL=Exit");
+    u8g2.sendBuffer();
+}
     
 // Packet structure for each advertisement
 typedef uint8_t* PacketPtr;
@@ -247,7 +262,7 @@ void bleSpamSetup() {
 void bleSpamLoop() {
     unsigned long now = millis();
     static uint8_t nextIdx = 0;
-    static unsigned long lastDisplayUpdate = 0;
+    static BleSpamMode previousMode = BLE_SPAM_MENU;
     const uint8_t batchSize = 5;
     char nameBuf[nameBufSize];
 
@@ -255,6 +270,21 @@ void bleSpamLoop() {
     bool down = digitalRead(BUTTON_PIN_DOWN) == LOW;
     bool left = digitalRead(BUTTON_PIN_LEFT) == LOW;
     bool right = digitalRead(BUTTON_PIN_RIGHT) == LOW;
+
+    if (bleSpamMode != previousMode) {
+        if (bleSpamMode == BLE_SPAM_RANDOM) {
+            drawActiveSpam("Random Spam");
+        } else if (bleSpamMode == BLE_SPAM_EMOJI) {
+            drawActiveSpam("Emoji Spam");
+        } else if (bleSpamMode == BLE_SPAM_CUSTOM) {
+            char buf[32];
+            snprintf(buf, sizeof(buf), "Index Count: %d", customNamesCount);
+            drawActiveSpam("Custom Spam", buf);
+        } else if (bleSpamMode == BLE_SPAM_ALL) {
+            drawActiveSpam("All Spam");
+        }
+        previousMode = bleSpamMode;
+    }
 
     switch (bleSpamMode) {
         case BLE_SPAM_MENU:
@@ -288,17 +318,6 @@ void bleSpamLoop() {
                 advertiseDevice(name);
             }
 
-            if (now - lastDisplayUpdate >= 250) {
-                lastDisplayUpdate = now;
-                u8g2.clearBuffer();
-                u8g2.setFont(u8g2_font_6x10_tr);
-                u8g2.drawStr(0, 12, "Random Spam");
-                u8g2.drawStr(0, 28, "Status: Active");
-                u8g2.setFont(u8g2_font_5x8_tr);
-                u8g2.drawStr(0, 62, "L=Back SEL=Exit");
-                u8g2.sendBuffer();
-            }
-
             if (left && now - lastButtonPress > debounceDelay) {
                 esp_ble_gap_stop_advertising();
                 delay(100);
@@ -311,17 +330,6 @@ void bleSpamLoop() {
             for (uint8_t i = 0; i < batchSize; i++) {
                 const char* name = pickName(nameBuf, 2);
                 advertiseDevice(name);
-            }
-
-            if (now - lastDisplayUpdate >= 250) {
-                lastDisplayUpdate = now;
-                u8g2.clearBuffer();
-                u8g2.setFont(u8g2_font_6x10_tr);
-                u8g2.drawStr(0, 12, "Emoji Spam");
-                u8g2.drawStr(0, 28, "Status: Active");
-                u8g2.setFont(u8g2_font_5x8_tr);
-                u8g2.drawStr(0, 62, "L=Back SEL=Exit");
-                u8g2.sendBuffer();
             }
 
             if (left && now - lastButtonPress > debounceDelay) {
@@ -339,20 +347,6 @@ void bleSpamLoop() {
                     nextIdx = (nextIdx + 1) % customNamesCount;
                     advertiseDevice(name);
                 }
-            }
-
-            if (now - lastDisplayUpdate >= 250) {
-                lastDisplayUpdate = now;
-                u8g2.clearBuffer();
-                u8g2.setFont(u8g2_font_6x10_tr);
-                u8g2.drawStr(0, 12, "Custom Spam");
-                char buf[32];
-                snprintf(buf, sizeof(buf), "Index Count: %d", customNamesCount);
-                u8g2.drawStr(0, 28, buf);
-                u8g2.drawStr(0, 44, "Status: Active");
-                u8g2.setFont(u8g2_font_5x8_tr);
-                u8g2.drawStr(0, 62, "L=Back SEL=Exit");
-                u8g2.sendBuffer();
             }
 
             if (left && now - lastButtonPress > debounceDelay) {
@@ -375,17 +369,6 @@ void bleSpamLoop() {
                     name = pickName(nameBuf, useMode);
                 }
                 advertiseDevice(name);
-            }
-
-            if (now - lastDisplayUpdate >= 250) {
-                lastDisplayUpdate = now;
-                u8g2.clearBuffer();
-                u8g2.setFont(u8g2_font_6x10_tr);
-                u8g2.drawStr(0, 12, "All Spam");
-                u8g2.drawStr(0, 28, "Status: Active");
-                u8g2.setFont(u8g2_font_5x8_tr);
-                u8g2.drawStr(0, 62, "L=Back SEL=Exit");
-                u8g2.sendBuffer();
             }
 
             if (left && now - lastButtonPress > debounceDelay) {
