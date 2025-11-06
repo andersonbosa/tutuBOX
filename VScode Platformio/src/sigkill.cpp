@@ -17,18 +17,13 @@ RF24 radio_2(RADIO_CE_PIN_2, RADIO_CSN_PIN_2, 16000000);
 RF24 radio_3(RADIO_CE_PIN_3, RADIO_CSN_PIN_3, 16000000);
 
 enum SigKillMode { SIG_MENU, SIG_JAMMING };
-enum ProtocolType { ALL, WIFI, VIDEO_TX, RC, BLE, BLUETOOTH, USB_WIRELESS, ZIGBEE, NRF24 };
+enum ProtocolType { ALL, WIFI, BLUETOOTH, BLE, VIDEO_TX, RC, USB_WIRELESS, ZIGBEE, NRF24 };
 
 static SigKillMode currentMode = SIG_MENU;
-static ProtocolType selectedProtocol = WIFI;
+static ProtocolType selectedProtocol = ALL;
 static int menuSelection = 0;
 static unsigned long lastButtonPress = 0;
 const unsigned long debounceDelay = 200;
-
-// Channel groups for nRF24 radios
-byte channelGroup_1[] = {2, 5, 8, 11};
-byte channelGroup_2[] = {26, 29, 32, 35};
-byte channelGroup_3[] = {80, 83, 86, 89};
 
 // Protocol channel definitions
 const byte bluetooth_channels[]        = {32,34,46,48,50,52,0,1,2,4,6,8,22,24,26,28,30,74,76,78,80};
@@ -41,11 +36,11 @@ const byte zigbee_channels[]           = {11,15,20,25};
 const byte nrf24_channels[]            = {76,78,79};
 
 const char* protocolNames[] = {
-  "All", "WiFi", "Video TX", "RC", "BLE", "Bluetooth",
+  "All", "WiFi", "Bluetooth", "BLE", "Video TX", "RC",
   "USB Wireless", "Zigbee", "NRF24"
 };
 
-void configureRadio(RF24 &radio, const byte *channels, size_t size) {
+void configureRadio(RF24 &radio, byte initialChannel) {
   radio.setAutoAck(false);
   radio.stopListening();
   radio.setRetries(0, 0);
@@ -53,18 +48,17 @@ void configureRadio(RF24 &radio, const byte *channels, size_t size) {
   radio.setDataRate(RF24_2MBPS);
   radio.setCRCLength(RF24_CRC_DISABLED);
   radio.printPrettyDetails();
-  for (size_t i = 0; i < size; i++) {
-    radio.setChannel(channels[i]);
-    radio.startConstCarrier(RF24_PA_MAX, channels[i]);
-  }
+  
+  radio.startConstCarrier(RF24_PA_MAX, initialChannel);
 }
 
 void initializeRadios() {
   SPI.begin();
   delay(100);
-  if (radio_1.begin()) configureRadio(radio_1, channelGroup_1, sizeof(channelGroup_1));
-  if (radio_2.begin()) configureRadio(radio_2, channelGroup_2, sizeof(channelGroup_2));
-  if (radio_3.begin()) configureRadio(radio_3, channelGroup_3, sizeof(channelGroup_3));
+  
+  if (radio_1.begin()) configureRadio(radio_1, 2);
+  if (radio_2.begin()) configureRadio(radio_2, 26);
+  if (radio_3.begin()) configureRadio(radio_3, 80);
 }
 
 void powerDownRadios() {
@@ -211,8 +205,8 @@ void sigkillLoop() {
       }
 
       {
-        int randomIndex;
-        int channel;
+        int randomIndex1, randomIndex2, randomIndex3;
+        int channel1, channel2, channel3;
 
         switch (selectedProtocol) {
           case ALL:
@@ -223,8 +217,8 @@ void sigkillLoop() {
 
               switch (protocolIndex % 8) {
                 case 0: channelArray = wifi_channels; arraySize = sizeof(wifi_channels); break;
-                case 1: channelArray = ble_channels; arraySize = sizeof(ble_channels); break;
-                case 2: channelArray = bluetooth_channels; arraySize = sizeof(bluetooth_channels); break;
+                case 1: channelArray = bluetooth_channels; arraySize = sizeof(bluetooth_channels); break;
+                case 2: channelArray = ble_channels; arraySize = sizeof(ble_channels); break;
                 case 3: channelArray = videoTransmitter_channels; arraySize = sizeof(videoTransmitter_channels); break;
                 case 4: channelArray = rc_channels; arraySize = sizeof(rc_channels); break;
                 case 5: channelArray = usbWireless_channels; arraySize = sizeof(usbWireless_channels); break;
@@ -232,78 +226,132 @@ void sigkillLoop() {
                 case 7: channelArray = nrf24_channels; arraySize = sizeof(nrf24_channels); break;
               }
 
-              randomIndex = random(0, arraySize / sizeof(byte));
-              channel = channelArray[randomIndex];
-              radio_1.setChannel(channel);
-              radio_2.setChannel(channel);
-              radio_3.setChannel(channel);
+              randomIndex1 = random(0, arraySize / sizeof(byte));
+              randomIndex2 = random(0, arraySize / sizeof(byte));
+              randomIndex3 = random(0, arraySize / sizeof(byte));
+              
+              channel1 = channelArray[randomIndex1];
+              channel2 = channelArray[randomIndex2];
+              channel3 = channelArray[randomIndex3];
+              
+              radio_1.setChannel(channel1);
+              radio_2.setChannel(channel2);
+              radio_3.setChannel(channel3);
 
               protocolIndex++;
             }
             break;
 
-          case BLE:
-            randomIndex = random(0, sizeof(ble_channels) / sizeof(ble_channels[0]));
-            channel = ble_channels[randomIndex];
-            radio_1.setChannel(channel);
-            radio_2.setChannel(channel);
-            radio_3.setChannel(channel);
+          case WIFI:
+            randomIndex1 = random(0, sizeof(wifi_channels) / sizeof(wifi_channels[0]));
+            randomIndex2 = random(0, sizeof(wifi_channels) / sizeof(wifi_channels[0]));
+            randomIndex3 = random(0, sizeof(wifi_channels) / sizeof(wifi_channels[0]));
+            
+            channel1 = wifi_channels[randomIndex1];
+            channel2 = wifi_channels[randomIndex2];
+            channel3 = wifi_channels[randomIndex3];
+            
+            radio_1.setChannel(channel1);
+            radio_2.setChannel(channel2);
+            radio_3.setChannel(channel3);
             break;
 
           case BLUETOOTH:
-            randomIndex = random(0, sizeof(bluetooth_channels) / sizeof(bluetooth_channels[0]));
-            channel = bluetooth_channels[randomIndex];
-            radio_1.setChannel(channel);
-            radio_2.setChannel(channel);
-            radio_3.setChannel(channel);
+            randomIndex1 = random(0, sizeof(bluetooth_channels) / sizeof(bluetooth_channels[0]));
+            randomIndex2 = random(0, sizeof(bluetooth_channels) / sizeof(bluetooth_channels[0]));
+            randomIndex3 = random(0, sizeof(bluetooth_channels) / sizeof(bluetooth_channels[0]));
+            
+            channel1 = bluetooth_channels[randomIndex1];
+            channel2 = bluetooth_channels[randomIndex2];
+            channel3 = bluetooth_channels[randomIndex3];
+            
+            radio_1.setChannel(channel1);
+            radio_2.setChannel(channel2);
+            radio_3.setChannel(channel3);
             break;
 
-          case WIFI:
-            randomIndex = random(0, sizeof(wifi_channels) / sizeof(wifi_channels[0]));
-            channel = wifi_channels[randomIndex];
-            radio_1.setChannel(channel);
-            radio_2.setChannel(channel);
-            radio_3.setChannel(channel);
-            break;
-
-          case USB_WIRELESS:
-            randomIndex = random(0, sizeof(usbWireless_channels) / sizeof(usbWireless_channels[0]));
-            channel = usbWireless_channels[randomIndex];
-            radio_1.setChannel(channel);
-            radio_2.setChannel(channel);
-            radio_3.setChannel(channel);
+          case BLE:
+            randomIndex1 = random(0, sizeof(ble_channels) / sizeof(ble_channels[0]));
+            randomIndex2 = random(0, sizeof(ble_channels) / sizeof(ble_channels[0]));
+            randomIndex3 = random(0, sizeof(ble_channels) / sizeof(ble_channels[0]));
+            
+            channel1 = ble_channels[randomIndex1];
+            channel2 = ble_channels[randomIndex2];
+            channel3 = ble_channels[randomIndex3];
+            
+            radio_1.setChannel(channel1);
+            radio_2.setChannel(channel2);
+            radio_3.setChannel(channel3);
             break;
 
           case VIDEO_TX:
-            randomIndex = random(0, sizeof(videoTransmitter_channels) / sizeof(videoTransmitter_channels[0]));
-            channel = videoTransmitter_channels[randomIndex];
-            radio_1.setChannel(channel);
-            radio_2.setChannel(channel);
-            radio_3.setChannel(channel);
+            randomIndex1 = random(0, sizeof(videoTransmitter_channels) / sizeof(videoTransmitter_channels[0]));
+            randomIndex2 = random(0, sizeof(videoTransmitter_channels) / sizeof(videoTransmitter_channels[0]));
+            randomIndex3 = random(0, sizeof(videoTransmitter_channels) / sizeof(videoTransmitter_channels[0]));
+            
+            channel1 = videoTransmitter_channels[randomIndex1];
+            channel2 = videoTransmitter_channels[randomIndex2];
+            channel3 = videoTransmitter_channels[randomIndex3];
+            
+            radio_1.setChannel(channel1);
+            radio_2.setChannel(channel2);
+            radio_3.setChannel(channel3);
             break;
 
           case RC:
-            randomIndex = random(0, sizeof(rc_channels) / sizeof(rc_channels[0]));
-            channel = rc_channels[randomIndex];
-            radio_1.setChannel(channel);
-            radio_2.setChannel(channel);
-            radio_3.setChannel(channel);
+            randomIndex1 = random(0, sizeof(rc_channels) / sizeof(rc_channels[0]));
+            randomIndex2 = random(0, sizeof(rc_channels) / sizeof(rc_channels[0]));
+            randomIndex3 = random(0, sizeof(rc_channels) / sizeof(rc_channels[0]));
+            
+            channel1 = rc_channels[randomIndex1];
+            channel2 = rc_channels[randomIndex2];
+            channel3 = rc_channels[randomIndex3];
+            
+            radio_1.setChannel(channel1);
+            radio_2.setChannel(channel2);
+            radio_3.setChannel(channel3);
+            break;
+
+          case USB_WIRELESS:
+            randomIndex1 = random(0, sizeof(usbWireless_channels) / sizeof(usbWireless_channels[0]));
+            randomIndex2 = random(0, sizeof(usbWireless_channels) / sizeof(usbWireless_channels[0]));
+            randomIndex3 = random(0, sizeof(usbWireless_channels) / sizeof(usbWireless_channels[0]));
+            
+            channel1 = usbWireless_channels[randomIndex1];
+            channel2 = usbWireless_channels[randomIndex2];
+            channel3 = usbWireless_channels[randomIndex3];
+            
+            radio_1.setChannel(channel1);
+            radio_2.setChannel(channel2);
+            radio_3.setChannel(channel3);
             break;
 
           case ZIGBEE:
-            randomIndex = random(0, sizeof(zigbee_channels) / sizeof(zigbee_channels[0]));
-            channel = zigbee_channels[randomIndex];
-            radio_1.setChannel(channel);
-            radio_2.setChannel(channel);
-            radio_3.setChannel(channel);
+            randomIndex1 = random(0, sizeof(zigbee_channels) / sizeof(zigbee_channels[0]));
+            randomIndex2 = random(0, sizeof(zigbee_channels) / sizeof(zigbee_channels[0]));
+            randomIndex3 = random(0, sizeof(zigbee_channels) / sizeof(zigbee_channels[0]));
+            
+            channel1 = zigbee_channels[randomIndex1];
+            channel2 = zigbee_channels[randomIndex2];
+            channel3 = zigbee_channels[randomIndex3];
+            
+            radio_1.setChannel(channel1);
+            radio_2.setChannel(channel2);
+            radio_3.setChannel(channel3);
             break;
 
           case NRF24:
-            randomIndex = random(0, sizeof(nrf24_channels) / sizeof(nrf24_channels[0]));
-            channel = nrf24_channels[randomIndex];
-            radio_1.setChannel(channel);
-            radio_2.setChannel(channel);
-            radio_3.setChannel(channel);
+            randomIndex1 = random(0, sizeof(nrf24_channels) / sizeof(nrf24_channels[0]));
+            randomIndex2 = random(0, sizeof(nrf24_channels) / sizeof(nrf24_channels[0]));
+            randomIndex3 = random(0, sizeof(nrf24_channels) / sizeof(nrf24_channels[0]));
+            
+            channel1 = nrf24_channels[randomIndex1];
+            channel2 = nrf24_channels[randomIndex2];
+            channel3 = nrf24_channels[randomIndex3];
+            
+            radio_1.setChannel(channel1);
+            radio_2.setChannel(channel2);
+            radio_3.setChannel(channel3);
             break;
         }
       }

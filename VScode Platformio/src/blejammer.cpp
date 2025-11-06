@@ -33,15 +33,11 @@ static int menuSelection = 0;
 static unsigned long lastButtonPress = 0;
 const unsigned long debounceDelay = 200;
 
-int bluetooth_channels[] = {32, 34, 46, 48, 50, 52, 0,  1,  2,  4, 6,
-                            8,  22, 24, 26, 28, 30, 74, 76, 78, 80};
-int ble_channels[] = {2, 26, 80};
+const byte bluetooth_channels[] = {32, 34, 46, 48, 50, 52, 0,  1,  2,  4, 6,
+                                   8,  22, 24, 26, 28, 30, 74, 76, 78, 80};
+const byte ble_channels[] = {2, 26, 80};
 
-byte channelGroup1[] = {2, 5, 8, 11};
-byte channelGroup2[] = {26, 29, 32, 35};
-byte channelGroup3[] = {80, 83, 86, 89};
-
-void configureRadio(RF24 &radio, const byte *channels, size_t size) {
+void configureRadio(RF24 &radio, byte initialChannel) {
   radio.setAutoAck(false);
   radio.stopListening();
   radio.setRetries(0, 0);
@@ -49,21 +45,17 @@ void configureRadio(RF24 &radio, const byte *channels, size_t size) {
   radio.setDataRate(RF24_2MBPS);
   radio.setCRCLength(RF24_CRC_DISABLED);
   radio.printPrettyDetails();
-  for (size_t i = 0; i < size; i++) {
-    radio.setChannel(channels[i]);
-    radio.startConstCarrier(RF24_PA_MAX, channels[i]);
-  }
+  
+  radio.startConstCarrier(RF24_PA_MAX, initialChannel);
 }
 
 void initializeRadiosForBLE() {
   SPI.begin();
   delay(100);
-  if (radio1.begin())
-    configureRadio(radio1, channelGroup1, sizeof(channelGroup1));
-  if (radio2.begin())
-    configureRadio(radio2, channelGroup2, sizeof(channelGroup2));
-  if (radio3.begin())
-    configureRadio(radio3, channelGroup3, sizeof(channelGroup3));
+  
+  if (radio1.begin()) configureRadio(radio1, 2);
+  if (radio2.begin()) configureRadio(radio2, 26);
+  if (radio3.begin()) configureRadio(radio3, 80);
 }
 
 void powerDownRadios() {
@@ -157,17 +149,6 @@ void blejammerLoop() {
   bool left = digitalRead(BUTTON_PIN_LEFT) == LOW;
   bool right = digitalRead(BUTTON_PIN_RIGHT) == LOW;
 
-  if (jammerMode != previousMode) {
-    if (jammerMode == JAM_BLE) {
-      drawActiveJamming("BLE Jamming");
-    } else if (jammerMode == JAM_BLUETOOTH) {
-      drawActiveJamming("Bluetooth Jamming");
-    } else if (jammerMode == JAM_ALL) {
-      drawActiveJamming("BT & BLE Jamming");
-    }
-    previousMode = jammerMode;
-  }
-
   switch (jammerMode) {
     case JAM_MENU:
       drawJammerMenu();
@@ -195,59 +176,99 @@ void blejammerLoop() {
       break;
 
     case JAM_BLE:
+      if (jammerMode != previousMode) {
+        drawActiveJamming("BLE Jamming");
+        previousMode = jammerMode;
+      }
+
       {
-        int idx = random(0, sizeof(ble_channels) / sizeof(ble_channels[0]));
-        int ch = ble_channels[idx];
-        radio1.setChannel(ch);
-        radio2.setChannel(ch);
-        radio3.setChannel(ch);
+        int randomIndex1 = random(0, sizeof(ble_channels) / sizeof(ble_channels[0]));
+        int randomIndex2 = random(0, sizeof(ble_channels) / sizeof(ble_channels[0]));
+        int randomIndex3 = random(0, sizeof(ble_channels) / sizeof(ble_channels[0]));
+        
+        int channel1 = ble_channels[randomIndex1];
+        int channel2 = ble_channels[randomIndex2];
+        int channel3 = ble_channels[randomIndex3];
+        
+        radio1.setChannel(channel1);
+        radio2.setChannel(channel2);
+        radio3.setChannel(channel3);
       }
 
       if (left && now - lastButtonPress > debounceDelay) {
         powerDownRadios();
         jammerMode = JAM_MENU;
+        previousMode = JAM_BLE;
         lastButtonPress = now;
       }
       break;
 
     case JAM_BLUETOOTH:
+      if (jammerMode != previousMode) {
+        drawActiveJamming("Bluetooth Jamming");
+        previousMode = jammerMode;
+      }
+
       {
-        int idx = random(0, sizeof(bluetooth_channels) / sizeof(bluetooth_channels[0]));
-        int ch = bluetooth_channels[idx];
-        radio1.setChannel(ch);
-        radio2.setChannel(ch);
-        radio3.setChannel(ch);
+        int randomIndex1 = random(0, sizeof(bluetooth_channels) / sizeof(bluetooth_channels[0]));
+        int randomIndex2 = random(0, sizeof(bluetooth_channels) / sizeof(bluetooth_channels[0]));
+        int randomIndex3 = random(0, sizeof(bluetooth_channels) / sizeof(bluetooth_channels[0]));
+        
+        int channel1 = bluetooth_channels[randomIndex1];
+        int channel2 = bluetooth_channels[randomIndex2];
+        int channel3 = bluetooth_channels[randomIndex3];
+        
+        radio1.setChannel(channel1);
+        radio2.setChannel(channel2);
+        radio3.setChannel(channel3);
       }
 
       if (left && now - lastButtonPress > debounceDelay) {
         powerDownRadios();
         jammerMode = JAM_MENU;
+        previousMode = JAM_BLUETOOTH;
         lastButtonPress = now;
       }
       break;
 
     case JAM_ALL:
+      if (jammerMode != previousMode) {
+        drawActiveJamming("BT & BLE Jamming");
+        previousMode = jammerMode;
+      }
+
       {
         static bool useBLE = true;
+        const byte* channelArray;
+        int arraySize;
+        
         if (useBLE) {
-          int idx = random(0, sizeof(ble_channels) / sizeof(ble_channels[0]));
-          int ch = ble_channels[idx];
-          radio1.setChannel(ch);
-          radio2.setChannel(ch);
-          radio3.setChannel(ch);
+          channelArray = ble_channels;
+          arraySize = sizeof(ble_channels) / sizeof(ble_channels[0]);
         } else {
-          int idx = random(0, sizeof(bluetooth_channels) / sizeof(bluetooth_channels[0]));
-          int ch = bluetooth_channels[idx];
-          radio1.setChannel(ch);
-          radio2.setChannel(ch);
-          radio3.setChannel(ch);
+          channelArray = bluetooth_channels;
+          arraySize = sizeof(bluetooth_channels) / sizeof(bluetooth_channels[0]);
         }
+        
+        int randomIndex1 = random(0, arraySize);
+        int randomIndex2 = random(0, arraySize);
+        int randomIndex3 = random(0, arraySize);
+        
+        int channel1 = channelArray[randomIndex1];
+        int channel2 = channelArray[randomIndex2];
+        int channel3 = channelArray[randomIndex3];
+        
+        radio1.setChannel(channel1);
+        radio2.setChannel(channel2);
+        radio3.setChannel(channel3);
+        
         useBLE = !useBLE;
       }
 
       if (left && now - lastButtonPress > debounceDelay) {
         powerDownRadios();
         jammerMode = JAM_MENU;
+        previousMode = JAM_ALL;
         lastButtonPress = now;
       }
       break;
