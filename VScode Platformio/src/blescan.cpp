@@ -33,6 +33,8 @@ const int MAX_DEVICES = 100;
 int currentIndex = 0;
 int listStartIndex = 0;
 bool isDetailView = false;
+bool isLocateMode = false;
+char locateTargetAddress[18] = {0};
 unsigned long lastButtonPress = 0;
 const unsigned long debounceTime = 200;
 
@@ -62,28 +64,32 @@ static void bda_to_string(uint8_t *bda, char *str, size_t size) {
 }
 
 static void process_scan_result(esp_ble_gap_cb_param_t *scan_result) {
-    if (bleDevices.size() >= MAX_DEVICES) {
-        return;
-    }
-
     uint8_t *bda = scan_result->scan_rst.bda;
     char addrStr[18];
     bda_to_string(bda, addrStr, sizeof(addrStr));
 
     if (strlen(addrStr) < 12) return;
 
+    if (isLocateMode && strlen(locateTargetAddress) > 0) {
+        if (strcmp(addrStr, locateTargetAddress) != 0) {
+            return;
+        }
+    } else if (bleDevices.size() >= MAX_DEVICES) {
+        return;
+    }
+
     for (size_t i = 0; i < bleDevices.size(); i++) {
         if (strcmp(bleDevices[i].address, addrStr) == 0) {
             bleDevices[i].rssi = scan_result->scan_rst.rssi;
             bleDevices[i].lastSeen = millis();
-            
+
             if (!bleDevices[i].hasName) {
                 uint8_t *adv_name = NULL;
                 uint8_t adv_name_len = 0;
                 adv_name = esp_ble_resolve_adv_data(scan_result->scan_rst.ble_adv,
                                                     ESP_BLE_AD_TYPE_NAME_CMPL,
                                                     &adv_name_len);
-                
+
                 if (adv_name == NULL) {
                     adv_name = esp_ble_resolve_adv_data(scan_result->scan_rst.ble_adv,
                                                         ESP_BLE_AD_TYPE_NAME_SHORT,
@@ -96,11 +102,13 @@ static void process_scan_result(esp_ble_gap_cb_param_t *scan_result) {
                     bleDevices[i].hasName = true;
                 }
             }
-            
-            std::sort(bleDevices.begin(), bleDevices.end(),
-                      [](const BLEDeviceData &a, const BLEDeviceData &b) {
-                        return a.rssi > b.rssi;
-                      });
+
+            if (!isLocateMode) {
+                std::sort(bleDevices.begin(), bleDevices.end(),
+                          [](const BLEDeviceData &a, const BLEDeviceData &b) {
+                            return a.rssi > b.rssi;
+                          });
+            }
             return;
         }
     }
@@ -133,11 +141,13 @@ static void process_scan_result(esp_ble_gap_cb_param_t *scan_result) {
     }
 
     bleDevices.push_back(newDev);
-    
-    std::sort(bleDevices.begin(), bleDevices.end(),
-              [](const BLEDeviceData &a, const BLEDeviceData &b) {
-                return a.rssi > b.rssi;
-              });
+
+    if (!isLocateMode) {
+        std::sort(bleDevices.begin(), bleDevices.end(),
+                  [](const BLEDeviceData &a, const BLEDeviceData &b) {
+                    return a.rssi > b.rssi;
+                  });
+    }
 }
 
 static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param) {
@@ -160,9 +170,14 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
             process_scan_result(param);
             break;
         case ESP_GAP_SEARCH_INQ_CMPL_EVT:
-            isScanning = false;
             lastScanTime = millis();
             scanCompleted = true;
+            if (isLocateMode) {
+                isScanning = true;
+                esp_ble_gap_start_scanning(scanDuration);
+            } else {
+                isScanning = false;
+            }
             break;
         default:
             break;
@@ -182,6 +197,8 @@ void blescanSetup() {
     bleDevices.reserve(MAX_DEVICES);
     currentIndex = listStartIndex = 0;
     isDetailView = false;
+    isLocateMode = false;
+    memset(locateTargetAddress, 0, sizeof(locateTargetAddress));
     lastButtonPress = 0;
     isScanning = true;
     scanCompleted = false;
@@ -226,36 +243,37 @@ void blescanLoop() {
 
     unsigned long now = millis();
 
-    if (isScanning) {
+    if (isScanning && !isLocateMode) {
         u8g2.clearBuffer();
         u8g2.setFont(u8g2_font_6x10_tr);
         u8g2.drawStr(0, 10, "Scanning for");
         u8g2.drawStr(0, 20, "BLE devices...");
-        
+
         char countStr[32];
         snprintf(countStr, sizeof(countStr), "%d/%d devices", (int)bleDevices.size(), MAX_DEVICES);
         u8g2.drawStr(0, 35, countStr);
-        
+
         int barWidth = 120;
         int barHeight = 10;
         int barX = (128 - barWidth) / 2;
         int barY = 42;
-        
+
         u8g2.drawFrame(barX, barY, barWidth, barHeight);
-        
+
         int fillWidth = (bleDevices.size() * (barWidth - 4)) / MAX_DEVICES;
         if (fillWidth > 0) {
             u8g2.drawBox(barX + 2, barY + 2, fillWidth, barHeight - 4);
         }
-        
+
         u8g2.setFont(u8g2_font_5x8_tr);
         u8g2.drawStr(0, 62, "Press SEL to exit");
-        
+
         u8g2.sendBuffer();
         return;
     }
 
-    if (!isScanning && scanCompleted && now - lastScanTime > scanInterval) {
+    if (!isScanning && scanCompleted && now - lastScanTime > scanInterval &&
+        !isDetailView && !isLocateMode) {
         if (bleDevices.size() >= MAX_DEVICES) {
             std::sort(bleDevices.begin(), bleDevices.end(),
                     [](const BLEDeviceData &a, const BLEDeviceData &b) {
@@ -264,16 +282,16 @@ void blescanLoop() {
                         }
                         return a.rssi < b.rssi;
                     });
-            
+
             int devicesToRemove = MAX_DEVICES / 4;
             if (devicesToRemove > 0) {
-                bleDevices.erase(bleDevices.begin(), 
+                bleDevices.erase(bleDevices.begin(),
                                 bleDevices.begin() + devicesToRemove);
             }
-            
+
             currentIndex = listStartIndex = 0;
         }
-        
+
         scanCompleted = false;
         isScanning = true;
         esp_ble_gap_start_scanning(scanDuration);
@@ -282,23 +300,49 @@ void blescanLoop() {
     }
 
     if (scanCompleted && now - lastButtonPress > debounceTime) {
-        if (!isDetailView && digitalRead(BTN_UP) == LOW && currentIndex > 0) {
+        if (!isDetailView && !isLocateMode && digitalRead(BTN_UP) == LOW && currentIndex > 0) {
             --currentIndex;
             if (currentIndex < listStartIndex)
                 --listStartIndex;
             lastButtonPress = now;
-        } else if (!isDetailView && digitalRead(BTN_DOWN) == LOW &&
+        } else if (!isDetailView && !isLocateMode && digitalRead(BTN_DOWN) == LOW &&
                    currentIndex < (int)bleDevices.size() - 1) {
             ++currentIndex;
             if (currentIndex >= listStartIndex + 5)
                 ++listStartIndex;
             lastButtonPress = now;
-        } else if (!isDetailView && digitalRead(BTN_RIGHT) == LOW &&
+        } else if (!isDetailView && !isLocateMode && digitalRead(BTN_RIGHT) == LOW &&
                    !bleDevices.empty()) {
             isDetailView = true;
+            if (isScanning) {
+                esp_ble_gap_stop_scanning();
+                isScanning = false;
+            }
             lastButtonPress = now;
-        } else if (digitalRead(BTN_BACK) == LOW) {
+        } else if (isDetailView && !isLocateMode && digitalRead(BTN_RIGHT) == LOW &&
+                   !bleDevices.empty()) {
+            isLocateMode = true;
+            strncpy(locateTargetAddress, bleDevices[currentIndex].address, sizeof(locateTargetAddress) - 1);
+            locateTargetAddress[sizeof(locateTargetAddress) - 1] = '\0';
+            if (!isScanning) {
+                isScanning = true;
+                esp_ble_gap_start_scanning(scanDuration);
+            }
+            lastButtonPress = now;
+        } else if (isLocateMode && digitalRead(BTN_BACK) == LOW) {
+            isLocateMode = false;
+            memset(locateTargetAddress, 0, sizeof(locateTargetAddress));
+            if (isScanning) {
+                esp_ble_gap_stop_scanning();
+                isScanning = false;
+            }
+            lastButtonPress = now;
+        } else if (isDetailView && !isLocateMode && digitalRead(BTN_BACK) == LOW) {
             isDetailView = false;
+            if (isScanning) {
+                esp_ble_gap_stop_scanning();
+                isScanning = false;
+            }
             lastButtonPress = now;
         }
     }
@@ -306,6 +350,8 @@ void blescanLoop() {
     if (bleDevices.empty()) {
         currentIndex = listStartIndex = 0;
         isDetailView = false;
+        isLocateMode = false;
+        memset(locateTargetAddress, 0, sizeof(locateTargetAddress));
     } else {
         currentIndex = constrain(currentIndex, 0, (int)bleDevices.size() - 1);
         listStartIndex =
@@ -323,6 +369,55 @@ void blescanLoop() {
         snprintf(timeStr, sizeof(timeStr), "Scanning in %lus", timeLeft);
         u8g2.drawStr(0, 30, timeStr);
         u8g2.drawStr(0, 45, "Press SEL to exit");
+    } else if (isLocateMode) {
+        auto &dev = bleDevices[currentIndex];
+        u8g2.setFont(u8g2_font_5x8_tr);
+        char buf[32];
+
+        snprintf(buf, sizeof(buf), "%.16s", dev.name);
+        u8g2.drawStr(0, 8, buf);
+
+        snprintf(buf, sizeof(buf), "%s", dev.address);
+        u8g2.drawStr(0, 16, buf);
+
+        u8g2.setFont(u8g2_font_7x13B_tr);
+        snprintf(buf, sizeof(buf), "RSSI: %d dBm", dev.rssi);
+        u8g2.drawStr(0, 28, buf);
+
+        u8g2.setFont(u8g2_font_5x8_tr);
+        int rssiClamped = constrain(dev.rssi, -100, -40);
+        int signalLevel = map(rssiClamped, -100, -40, 0, 5);
+
+        const char* quality;
+        if (signalLevel >= 5) quality = "EXCELLENT";
+        else if (signalLevel >= 4) quality = "VERY GOOD";
+        else if (signalLevel >= 3) quality = "GOOD";
+        else if (signalLevel >= 2) quality = "FAIR";
+        else if (signalLevel >= 1) quality = "WEAK";
+        else quality = "VERY WEAK";
+
+        snprintf(buf, sizeof(buf), "Signal: %s", quality);
+        u8g2.drawStr(0, 38, buf);
+
+        int barWidth = 12;
+        int barSpacing = 5;
+        int totalWidth = (barWidth * 5) + (barSpacing * 4);
+        int startX = (128 - totalWidth) / 2;
+        int baseY = 54;
+
+        for (int i = 0; i < 5; i++) {
+            int barHeight = 8 + (i * 2);
+            int x = startX + (i * (barWidth + barSpacing));
+            int y = baseY - barHeight;
+
+            if (i < signalLevel) {
+                u8g2.drawBox(x, y, barWidth, barHeight);
+            } else {
+                u8g2.drawFrame(x, y, barWidth, barHeight);
+            }
+        }
+
+        u8g2.drawStr(0, 62, "L=Back SEL=Exit");
     } else if (isDetailView) {
         auto &dev = bleDevices[currentIndex];
         u8g2.setFont(u8g2_font_5x8_tr);
@@ -335,7 +430,7 @@ void blescanLoop() {
         u8g2.drawStr(0, 30, buf);
         snprintf(buf, sizeof(buf), "Age: %lus", (millis() - dev.lastSeen) / 1000);
         u8g2.drawStr(0, 40, buf);
-        u8g2.drawStr(0, 60, "L=Back SEL=Exit");
+        u8g2.drawStr(0, 60, "L=Back SEL=Exit R=Locate");
     } else {
         u8g2.setFont(u8g2_font_6x10_tr);
         char header[32];
