@@ -31,6 +31,7 @@
 #include "../include/ble_spammer.h"
 #include "../include/swiftpair.h"
 #include "../include/flipperzero_detector.h"
+#include "../include/meshtastic_detector.h"
 #include "../include/airtag_detector.h"
 #include "../include/airtag_spoofer.h"
 #include "../include/wifiscan.h"
@@ -432,6 +433,7 @@ MenuItem bleMenu[] = {
   { "nyanBOX Detector", nullptr, nyanboxDetectorSetup,         nyanboxDetectorLoop,         cleanupBLE },
   { "Flipper Zero Detector", nullptr, flipperZeroDetectorSetup, flipperZeroDetectorLoop, cleanupBLE },
   { "Axon Detector", nullptr, axonDetectorSetup, axonDetectorLoop, cleanupBLE },
+  { "Meshtastic Detector", nullptr, meshtasticDetectorSetup, meshtasticDetectorLoop, cleanupBLE },
   { "Skimmer Detector", nullptr, cardskimmerDetectorSetup, cardskimmerDetectorLoop, cleanupBLE },
   { "AirTag Detector", nullptr, airtagDetectorSetup,   airtagDetectorLoop,      cleanupBLE },
   { "AirTag Spoofer", nullptr, airtagSpooferSetup,     airtagSpooferLoop,       cleanupBLE },
