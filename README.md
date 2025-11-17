@@ -75,6 +75,7 @@ Built around an ESP32 with triple NRF24 modules, a crisp OLED display, and a 250
 - **Flipper Scanner** – Detects nearby Flipper Zero devices
 - **Axon Detector** – Detects nearby Axon devices (body cameras, tasers, and other law enforcement equipment)
 - **Meshtastic Detector** - Detects nearby devices running Meshtastic firmware
+- **MeshCore Detector** - Detects nearby devices running MeshCore firmware
 - **Skimmer Detector** – Detects HC-03, HC-05, and HC-06 Bluetooth modules commonly used in credit card skimming devices.
 - **AirTag Detector** – Scans for and identifies nearby Apple AirTag devices.
 - **AirTag Spoofer** – Clones and rebroadcasts detected Apple AirTag devices for selective or bulk spoofing.
