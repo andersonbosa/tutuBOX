@@ -11,9 +11,11 @@
 
 extern bool neoPixelActive;
 extern bool dangerousActionsEnabled;
+extern bool continuousScanEnabled;
 
 void settingSetup();
 void settingLoop();
 bool isDangerousActionsEnabled();
+bool isContinuousScanEnabled();
 
 #endif

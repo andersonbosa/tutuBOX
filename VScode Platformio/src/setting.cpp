@@ -20,12 +20,14 @@ extern U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2;
 #define EEPROM_ADDRESS_BRIGHTNESS 1
 #define EEPROM_ADDRESS_DANGEROUS_MODE 2
 #define EEPROM_ADDRESS_SLEEP_TIMEOUT 3
+#define EEPROM_ADDRESS_CONTINUOUS_SCAN 4
 
 int currentSetting = 0;
-int totalSettings = 5;
+int totalSettings = 6;
 bool neoPixelActive = true;
 uint8_t oledBrightness = 100;
 extern bool dangerousActionsEnabled;
+bool continuousScanEnabled = true;
 bool showResetConfirm = false;
 uint8_t sleepTimeoutIndex = 3;
 
@@ -34,6 +36,7 @@ static int lastCurrentSetting = -1;
 static bool lastNeoPixelActive = true;
 static uint8_t lastOledBrightness = 100;
 static bool lastDangerousActionsEnabled = false;
+static bool lastContinuousScanEnabled = true;
 static bool lastShowResetConfirm = false;
 static uint8_t lastSleepTimeoutIndex = 3;
 
@@ -63,6 +66,7 @@ void settingSetup() {
   uint8_t neoPixelValue = EEPROM.read(EEPROM_ADDRESS_NEOPIXEL);
   uint8_t brightnessValue = EEPROM.read(EEPROM_ADDRESS_BRIGHTNESS);
   uint8_t sleepTimeoutValue = EEPROM.read(EEPROM_ADDRESS_SLEEP_TIMEOUT);
+  uint8_t continuousScanValue = EEPROM.read(EEPROM_ADDRESS_CONTINUOUS_SCAN);
 
   if (neoPixelValue == 0xFF) {
     neoPixelActive = true;
@@ -86,6 +90,14 @@ void settingSetup() {
     sleepTimeoutIndex = sleepTimeoutValue;
   }
 
+  if (continuousScanValue == 0xFF) {
+    continuousScanEnabled = true;
+    EEPROM.write(EEPROM_ADDRESS_CONTINUOUS_SCAN, 1);
+    EEPROM.commit();
+  } else {
+    continuousScanEnabled = (continuousScanValue == 1);
+  }
+
   u8g2.setContrast(oledBrightness);
 
   updateSleepTimeout(sleepTimeouts[sleepTimeoutIndex] * 1000);
@@ -98,6 +110,7 @@ void settingSetup() {
   lastNeoPixelActive = neoPixelActive;
   lastOledBrightness = oledBrightness;
   lastDangerousActionsEnabled = dangerousActionsEnabled;
+  lastContinuousScanEnabled = continuousScanEnabled;
   lastShowResetConfirm = false;
   lastSleepTimeoutIndex = sleepTimeoutIndex;
 }
@@ -192,6 +205,13 @@ void settingLoop() {
             break;
 
           case 4:
+            continuousScanEnabled = !continuousScanEnabled;
+            EEPROM.write(EEPROM_ADDRESS_CONTINUOUS_SCAN, continuousScanEnabled ? 1 : 0);
+            EEPROM.commit();
+            needsRedraw = true;
+            break;
+
+          case 5:
             showResetConfirm = true;
             needsRedraw = true;
             break;
@@ -237,6 +257,10 @@ void settingLoop() {
   }
   if (lastSleepTimeoutIndex != sleepTimeoutIndex) {
     lastSleepTimeoutIndex = sleepTimeoutIndex;
+    needsRedraw = true;
+  }
+  if (lastContinuousScanEnabled != continuousScanEnabled) {
+    lastContinuousScanEnabled = continuousScanEnabled;
     needsRedraw = true;
   }
 
@@ -293,6 +317,10 @@ void settingLoop() {
           u8g2.drawStr(85, yPos, sleepTimeoutNames[sleepTimeoutIndex]);
           break;
         case 4:
+          u8g2.drawStr(10, yPos, "Fast Retry:");
+          u8g2.drawStr(85, yPos, continuousScanEnabled ? "On" : "Off");
+          break;
+        case 5:
           u8g2.drawStr(10, yPos, "Reset XP:");
           char lvlStr[8];
           sprintf(lvlStr, "Lv%d", getCurrentLevel());
@@ -309,4 +337,8 @@ void settingLoop() {
 
 bool isDangerousActionsEnabled() {
   return dangerousActionsEnabled;
+}
+
+bool isContinuousScanEnabled() {
+  return continuousScanEnabled;
 }

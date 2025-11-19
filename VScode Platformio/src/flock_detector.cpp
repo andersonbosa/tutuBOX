@@ -8,6 +8,7 @@
 #include "../include/flock_detector.h"
 #include "../include/sleep_manager.h"
 #include "../include/display_mirror.h"
+#include "../include/setting.h"
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_bt.h"
@@ -428,16 +429,28 @@ void flockDetectorSetup() {
 void flockDetectorLoop() {
     unsigned long now = millis();
 
+    unsigned long effectiveWifiScanDuration = wifiScanDuration;
+    unsigned long effectiveBleScanDuration = bleScanDuration;
+    unsigned long effectiveScanInterval = scanInterval;
+
+    if (flockDevices.empty() && isContinuousScanEnabled() && scanCompleted) {
+        effectiveWifiScanDuration = 3000;
+        effectiveBleScanDuration = 3000;
+        effectiveScanInterval = 500;
+    }
+
     if ((currentPhase == PHASE_WIFI_INIT) ||
         (isLocateMode && !bleInitialized)) {
         hop_channel();
     }
 
-    if (!scanCompleted && !isDetailView && !isLocateMode) {
+    bool shouldShowPhaseScreen = !scanCompleted || (flockDevices.empty() && isContinuousScanEnabled());
+
+    if (shouldShowPhaseScreen && !isDetailView && !isLocateMode && !scanCompleted) {
         if (currentPhase == PHASE_WIFI_INIT) {
             unsigned long elapsed = now - phaseStartTime;
 
-            if (elapsed >= wifiScanDuration) {
+            if (elapsed >= effectiveWifiScanDuration) {
                 esp_wifi_set_promiscuous(false);
                 esp_wifi_stop();
                 delay(100);
@@ -462,7 +475,7 @@ void flockDetectorLoop() {
                 phaseStartTime = now;
                 needsRedraw = true;
             } else {
-                if (lastDeviceCount != (int)flockDevices.size() || wasScanning != isScanning || (now - lastLocateUpdate >= 100)) {
+                if ((lastDeviceCount != (int)flockDevices.size() || wasScanning != isScanning) || (now - lastLocateUpdate >= 100)) {
                     lastDeviceCount = (int)flockDevices.size();
                     wasScanning = isScanning;
                     lastLocateUpdate = now;
@@ -486,7 +499,7 @@ void flockDetectorLoop() {
 
                     u8g2.drawFrame(barX, barY, barWidth, barHeight);
 
-                    int fillWidth = (elapsed * (barWidth - 4)) / wifiScanDuration;
+                    int fillWidth = (elapsed * (barWidth - 4)) / effectiveWifiScanDuration;
                     if (fillWidth > 0 && fillWidth < barWidth - 4) {
                         u8g2.drawBox(barX + 2, barY + 2, fillWidth, barHeight - 4);
                     }
@@ -502,7 +515,7 @@ void flockDetectorLoop() {
         } else if (currentPhase == PHASE_BLE_INIT) {
             unsigned long elapsed = now - phaseStartTime;
 
-            if (!isScanning && elapsed >= bleScanDuration) {
+            if (!isScanning && elapsed >= effectiveBleScanDuration) {
                 if (bleInitialized) {
                     esp_ble_gap_stop_scanning();
                     delay(50);
@@ -534,7 +547,10 @@ void flockDetectorLoop() {
                 lastScanTime = now;
                 needsRedraw = true;
             } else {
-                if (lastDeviceCount != (int)flockDevices.size() || wasScanning != isScanning || (now - lastLocateUpdate >= 100)) {
+                bool shouldRedraw = (lastDeviceCount != (int)flockDevices.size()) ||
+                                   (wasScanning != isScanning && !(flockDevices.empty() && isContinuousScanEnabled()));
+
+                if (shouldRedraw || (now - lastLocateUpdate >= 100)) {
                     lastDeviceCount = (int)flockDevices.size();
                     wasScanning = isScanning;
                     lastLocateUpdate = now;
@@ -555,7 +571,7 @@ void flockDetectorLoop() {
 
                     u8g2.drawFrame(barX, barY, barWidth, barHeight);
 
-                    int fillWidth = (elapsed * (barWidth - 4)) / bleScanDuration;
+                    int fillWidth = (elapsed * (barWidth - 4)) / effectiveBleScanDuration;
                     if (fillWidth > 0 && fillWidth < barWidth - 4) {
                         u8g2.drawBox(barX + 2, barY + 2, fillWidth, barHeight - 4);
                     }
@@ -576,7 +592,7 @@ void flockDetectorLoop() {
         needsRedraw = true;
     }
 
-    if (scanCompleted && now - lastScanTime > scanInterval && !isDetailView && !isLocateMode) {
+    if (scanCompleted && now - lastScanTime > effectiveScanInterval && !isDetailView && !isLocateMode) {
         if (flockDevices.size() >= MAX_DEVICES) {
             std::sort(flockDevices.begin(), flockDevices.end(),
                     [](const FlockDeviceData &a, const FlockDeviceData &b) {
@@ -746,14 +762,34 @@ void flockDetectorLoop() {
     u8g2.clearBuffer();
 
     if (flockDevices.empty()) {
-        u8g2.setFont(u8g2_font_6x10_tr);
-        u8g2.drawStr(0, 10, "No Flock devices");
-        u8g2.setFont(u8g2_font_5x8_tr);
-        char timeStr[32];
-        unsigned long timeLeft = (scanInterval - (now - lastScanTime)) / 1000;
-        snprintf(timeStr, sizeof(timeStr), "Scanning in %lus", timeLeft);
-        u8g2.drawStr(0, 30, timeStr);
-        u8g2.drawStr(0, 45, "Press SEL to exit");
+        if (isContinuousScanEnabled()) {
+
+            u8g2.setFont(u8g2_font_6x10_tr);
+            u8g2.drawStr(0, 10, "Flock Detector");
+            u8g2.drawStr(0, 22, "Scanning...");
+
+            char countStr[32];
+            snprintf(countStr, sizeof(countStr), "Found: %d", 0);
+            u8g2.drawStr(0, 34, countStr);
+
+            int barWidth = 120;
+            int barHeight = 10;
+            int barX = (128 - barWidth) / 2;
+            int barY = 38;
+            u8g2.drawFrame(barX, barY, barWidth, barHeight);
+
+            u8g2.setFont(u8g2_font_5x8_tr);
+            u8g2.drawStr(0, 62, "Press SEL to exit");
+        } else {
+            u8g2.setFont(u8g2_font_6x10_tr);
+            u8g2.drawStr(0, 10, "No Flock devices");
+            u8g2.setFont(u8g2_font_5x8_tr);
+            char timeStr[32];
+            unsigned long timeLeft = (scanInterval - (now - lastScanTime)) / 1000;
+            snprintf(timeStr, sizeof(timeStr), "Scanning in %lus", timeLeft);
+            u8g2.drawStr(0, 30, timeStr);
+            u8g2.drawStr(0, 45, "Press SEL to exit");
+        }
     } else if (isLocateMode) {
         auto &dev = flockDevices[currentIndex];
         u8g2.setFont(u8g2_font_5x8_tr);

@@ -8,6 +8,7 @@
 #include "../include/meshcore_detector.h"
 #include "../include/sleep_manager.h"
 #include "../include/display_mirror.h"
+#include "../include/setting.h"
 #include "esp_bt.h"
 #include "esp_gap_ble_api.h"
 #include "esp_bt_main.h"
@@ -376,7 +377,16 @@ void meshcoreDetectorLoop() {
         needsRedraw = true;
     }
 
-    if (!isScanning && scanCompleted && now - lastScanTime > scanInterval &&
+
+    unsigned long effectiveScanInterval = scanInterval;
+    uint32_t effectiveScanDuration = scanDuration;
+
+    if (meshcoreDevices.empty() && isContinuousScanEnabled()) {
+        effectiveScanInterval = 500;
+        effectiveScanDuration = 3;
+    }
+
+    if (!isScanning && scanCompleted && now - lastScanTime > effectiveScanInterval &&
         !isDetailView && !isLocateMode) {
         if (meshcoreDevices.size() >= MAX_DEVICES) {
             std::sort(meshcoreDevices.begin(), meshcoreDevices.end(),
@@ -398,7 +408,7 @@ void meshcoreDetectorLoop() {
 
         scanCompleted = false;
         isScanning = true;
-        esp_ble_gap_start_scanning(scanDuration);
+        esp_ble_gap_start_scanning(effectiveScanDuration);
         lastScanTime = now;
         return;
     }
@@ -496,14 +506,34 @@ void meshcoreDetectorLoop() {
     u8g2.clearBuffer();
 
     if (meshcoreDevices.empty()) {
-        u8g2.setFont(u8g2_font_6x10_tr);
-        u8g2.drawStr(0, 10, "No MeshCore found");
-        u8g2.setFont(u8g2_font_5x8_tr);
-        char timeStr[32];
-        unsigned long timeLeft = (scanInterval - (now - lastScanTime)) / 1000;
-        snprintf(timeStr, sizeof(timeStr), "Scanning in %lus", timeLeft);
-        u8g2.drawStr(0, 30, timeStr);
-        u8g2.drawStr(0, 45, "Press SEL to exit");
+        if (isContinuousScanEnabled()) {
+
+            u8g2.setFont(u8g2_font_6x10_tr);
+            u8g2.drawStr(0, 10, "Scanning for");
+            u8g2.drawStr(0, 20, "MeshCore...");
+
+            char countStr[32];
+            snprintf(countStr, sizeof(countStr), "%d/%d devices", 0, MAX_DEVICES);
+            u8g2.drawStr(0, 35, countStr);
+
+            int barWidth = 120;
+            int barHeight = 10;
+            int barX = (128 - barWidth) / 2;
+            int barY = 42;
+            u8g2.drawFrame(barX, barY, barWidth, barHeight);
+
+            u8g2.setFont(u8g2_font_5x8_tr);
+            u8g2.drawStr(0, 62, "Press SEL to exit");
+        } else {
+            u8g2.setFont(u8g2_font_6x10_tr);
+            u8g2.drawStr(0, 10, "No MeshCore found");
+            u8g2.setFont(u8g2_font_5x8_tr);
+            char timeStr[32];
+            unsigned long timeLeft = (scanInterval - (now - lastScanTime)) / 1000;
+            snprintf(timeStr, sizeof(timeStr), "Scanning in %lus", timeLeft);
+            u8g2.drawStr(0, 30, timeStr);
+            u8g2.drawStr(0, 45, "Press SEL to exit");
+        }
     } else if (isLocateMode) {
         auto &dev = meshcoreDevices[currentIndex];
         u8g2.setFont(u8g2_font_5x8_tr);

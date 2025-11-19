@@ -6,6 +6,7 @@
 #include "../include/wifiscan.h"
 #include "../include/sleep_manager.h"
 #include "../include/display_mirror.h"
+#include "../include/setting.h"
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include <vector>
@@ -226,7 +227,17 @@ void wifiscanSetup() {
 void wifiscanLoop() {
   unsigned long now = millis();
 
-  if (wifiscan_isScanning) {
+  unsigned long effectiveScanInterval = scanInterval;
+  unsigned long effectiveScanDuration = scanDuration;
+
+  if (wifiNetworks.empty() && isContinuousScanEnabled() && wifiscan_scanCompleted) {
+    effectiveScanInterval = 500;
+    effectiveScanDuration = 3000;
+  }
+
+  bool shouldShowScanningScreen = wifiscan_isScanning || (wifiNetworks.empty() && isContinuousScanEnabled());
+
+  if (shouldShowScanningScreen) {
     uint16_t currentApCount = 0;
     esp_wifi_scan_get_ap_num(&currentApCount);
 
@@ -240,7 +251,7 @@ void wifiscanLoop() {
       wifiscan_lastDisplayUpdate = now;
     }
 
-    if (now - wifiscan_scanStartTime > scanDuration) {
+    if (wifiscan_isScanning && now - wifiscan_scanStartTime > effectiveScanDuration) {
       processScanResults(now);
 
       wifiscan_lastScanTime = now;
@@ -271,10 +282,7 @@ void wifiscanLoop() {
     }
 
     if (!isLocateMode) {
-      if (wasScanning && !wifiscan_isScanning) {
-        wasScanning = wifiscan_isScanning;
-        needsRedraw = true;
-      } else if (lastNetworkCount != (int)wifiNetworks.size() || wasScanning != wifiscan_isScanning) {
+      if (lastNetworkCount != (int)wifiNetworks.size() || wasScanning != wifiscan_isScanning) {
         lastNetworkCount = (int)wifiNetworks.size();
         wasScanning = wifiscan_isScanning;
 
@@ -303,10 +311,8 @@ void wifiscanLoop() {
         u8g2.drawStr(0, 62, "Press SEL to exit");
         u8g2.sendBuffer();
         displayMirrorSend(u8g2);
-        return;
-      } else {
-        return;
       }
+      return;
     }
   }
 
@@ -315,7 +321,7 @@ void wifiscanLoop() {
     needsRedraw = true;
   }
 
-  if (!wifiscan_isScanning && wifiscan_scanCompleted && now - wifiscan_lastScanTime > scanInterval &&
+  if (!wifiscan_isScanning && wifiscan_scanCompleted && now - wifiscan_lastScanTime > effectiveScanInterval &&
       !isDetailView && !isLocateMode) {
     if (wifiNetworks.size() >= MAX_NETWORKS) {
       std::sort(wifiNetworks.begin(), wifiNetworks.end(),
@@ -460,14 +466,33 @@ void wifiscanLoop() {
   u8g2.clearBuffer();
 
   if (wifiNetworks.empty()) {
-    u8g2.setFont(u8g2_font_6x10_tr);
-    u8g2.drawStr(0, 10, "No networks found");
-    u8g2.setFont(u8g2_font_5x8_tr);
-    char timeStr[32];
-    unsigned long timeLeft = (scanInterval - (now - wifiscan_lastScanTime)) / 1000;
-    snprintf(timeStr, sizeof(timeStr), "Scanning in %lus", timeLeft);
-    u8g2.drawStr(0, 30, timeStr);
-    u8g2.drawStr(0, 45, "Press SEL to exit");
+    if (isContinuousScanEnabled()) {
+      u8g2.setFont(u8g2_font_6x10_tr);
+      u8g2.drawStr(0, 10, "Scanning for");
+      u8g2.drawStr(0, 20, "WiFi networks...");
+
+      char countStr[32];
+      snprintf(countStr, sizeof(countStr), "%d/%d networks", 0, MAX_NETWORKS);
+      u8g2.drawStr(0, 35, countStr);
+
+      int barWidth = 120;
+      int barHeight = 10;
+      int barX = (128 - barWidth) / 2;
+      int barY = 42;
+      u8g2.drawFrame(barX, barY, barWidth, barHeight);
+
+      u8g2.setFont(u8g2_font_5x8_tr);
+      u8g2.drawStr(0, 62, "Press SEL to exit");
+    } else {
+      u8g2.setFont(u8g2_font_6x10_tr);
+      u8g2.drawStr(0, 10, "No networks found");
+      u8g2.setFont(u8g2_font_5x8_tr);
+      char timeStr[32];
+      unsigned long timeLeft = (scanInterval - (now - wifiscan_lastScanTime)) / 1000;
+      snprintf(timeStr, sizeof(timeStr), "Scanning in %lus", timeLeft);
+      u8g2.drawStr(0, 30, timeStr);
+      u8g2.drawStr(0, 45, "Press SEL to exit");
+    }
   } else if (isLocateMode) {
     auto &net = wifiNetworks[currentIndex];
     u8g2.setFont(u8g2_font_5x8_tr);
