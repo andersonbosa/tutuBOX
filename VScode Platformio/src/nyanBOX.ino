@@ -35,6 +35,7 @@
 #include "../include/meshcore_detector.h"
 #include "../include/airtag_detector.h"
 #include "../include/airtag_spoofer.h"
+#include "../include/tile_detector.h"
 #include "../include/wifiscan.h"
 #include "../include/deauth.h"
 #include "../include/deauth_scanner.h"
@@ -439,6 +440,7 @@ MenuItem bleMenu[] = {
   { "Skimmer Detector", nullptr, cardskimmerDetectorSetup, cardskimmerDetectorLoop, cleanupBLE },
   { "AirTag Detector", nullptr, airtagDetectorSetup,   airtagDetectorLoop,      cleanupBLE },
   { "AirTag Spoofer", nullptr, airtagSpooferSetup,     airtagSpooferLoop,       cleanupBLE },
+  { "Tile Detector", nullptr, tileDetectorSetup,     tileDetectorLoop,       cleanupBLE },
   { "BLE Spammer",  nullptr, bleSpamSetup,             bleSpamLoop,             cleanupBLE },
   { "BLE Jammer",   nullptr, blejammerSetup,           blejammerLoop,           cleanupRadio },
   { "Swift Pair",   nullptr, swiftpairSpamSetup,       swiftpairSpamLoop,       cleanupBLE },
