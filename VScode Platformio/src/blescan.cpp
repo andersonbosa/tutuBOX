@@ -21,14 +21,7 @@ extern U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2;
 #define BTN_RIGHT BUTTON_PIN_RIGHT
 #define BTN_BACK BUTTON_PIN_LEFT
 
-struct BLEDeviceData {
-  char name[32];
-  char address[18];
-  int8_t rssi;
-  bool hasName;
-  unsigned long lastSeen;
-};
-static std::vector<BLEDeviceData> bleDevices;
+std::vector<BLEDeviceData> bleDevices;
 
 const int MAX_DEVICES = 100;
 
@@ -75,6 +68,17 @@ static void bda_to_string(uint8_t *bda, char *str, size_t size) {
 
 static void process_scan_result(esp_ble_gap_cb_param_t *scan_result) {
     uint8_t *bda = scan_result->scan_rst.bda;
+    uint8_t *payload = scan_result->scan_rst.ble_adv;
+    uint8_t payload_len = scan_result->scan_rst.adv_data_len;
+
+    uint8_t *scan_rsp = NULL;
+    uint8_t scan_rsp_len = 0;
+
+    if (scan_result->scan_rst.scan_rsp_len > 0) {
+        scan_rsp = scan_result->scan_rst.ble_adv + scan_result->scan_rst.adv_data_len;
+        scan_rsp_len = scan_result->scan_rst.scan_rsp_len;
+    }
+
     char addrStr[18];
     bda_to_string(bda, addrStr, sizeof(addrStr));
 
@@ -92,6 +96,21 @@ static void process_scan_result(esp_ble_gap_cb_param_t *scan_result) {
         if (strcmp(bleDevices[i].address, addrStr) == 0) {
             bleDevices[i].rssi = scan_result->scan_rst.rssi;
             bleDevices[i].lastSeen = millis();
+
+            memcpy(bleDevices[i].bdAddr, bda, 6);
+
+            bleDevices[i].advType = scan_result->scan_rst.ble_evt_type;
+            bleDevices[i].addrType = scan_result->scan_rst.ble_addr_type;
+
+            if (payload_len > 0 && payload_len < 64) {
+                memcpy(bleDevices[i].payload, payload, payload_len);
+                bleDevices[i].payloadLength = payload_len;
+            }
+
+            if (scan_rsp_len > 0 && scan_rsp_len < 64) {
+                memcpy(bleDevices[i].scanResponse, scan_rsp, scan_rsp_len);
+                bleDevices[i].scanResponseLength = scan_rsp_len;
+            }
 
             if (!bleDevices[i].hasName) {
                 uint8_t *adv_name = NULL;
@@ -126,9 +145,29 @@ static void process_scan_result(esp_ble_gap_cb_param_t *scan_result) {
     BLEDeviceData newDev = {};
     strncpy(newDev.address, addrStr, 17);
     newDev.address[17] = '\0';
+
+    memcpy(newDev.bdAddr, bda, 6);
+
     newDev.rssi = scan_result->scan_rst.rssi;
     newDev.lastSeen = millis();
-    
+
+    newDev.advType = scan_result->scan_rst.ble_evt_type;
+    newDev.addrType = scan_result->scan_rst.ble_addr_type;
+
+    if (payload_len > 0 && payload_len < 64) {
+        memcpy(newDev.payload, payload, payload_len);
+        newDev.payloadLength = payload_len;
+    } else {
+        newDev.payloadLength = 0;
+    }
+
+    if (scan_rsp_len > 0 && scan_rsp_len < 64) {
+        memcpy(newDev.scanResponse, scan_rsp, scan_rsp_len);
+        newDev.scanResponseLength = scan_rsp_len;
+    } else {
+        newDev.scanResponseLength = 0;
+    }
+
     strcpy(newDev.name, "Unknown");
     newDev.hasName = false;
 
@@ -137,7 +176,7 @@ static void process_scan_result(esp_ble_gap_cb_param_t *scan_result) {
     adv_name = esp_ble_resolve_adv_data(scan_result->scan_rst.ble_adv,
                                         ESP_BLE_AD_TYPE_NAME_CMPL,
                                         &adv_name_len);
-    
+
     if (adv_name == NULL) {
         adv_name = esp_ble_resolve_adv_data(scan_result->scan_rst.ble_adv,
                                             ESP_BLE_AD_TYPE_NAME_SHORT,

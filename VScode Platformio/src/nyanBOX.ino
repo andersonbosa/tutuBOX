@@ -23,12 +23,10 @@
 
 #include "../include/scanner.h"
 #include "../include/analyzer.h"
-#include "../include/jammer.h" 
-#include "../include/blejammer.h"
-#include "../include/spoofer.h"
 #include "../include/sourapple.h"
 #include "../include/blescan.h"
 #include "../include/ble_spammer.h"
+#include "../include/ble_spoofer.h"
 #include "../include/swiftpair.h"
 #include "../include/flipperzero_detector.h"
 #include "../include/meshtastic_detector.h"
@@ -206,8 +204,7 @@ bool isReconApp(const char* appName) {
 }
 
 bool isDangerousApp(const char* appName) {
-  return strstr(appName, "Jammer") != nullptr ||
-         strstr(appName, "SigKill") != nullptr;
+  return strstr(appName, "SigKill") != nullptr;
 }
 
 bool isOffensiveApp(const char* appName) {
@@ -423,7 +420,6 @@ MenuItem wifiMenu[] = {
   { "Deauth Scanner",  nullptr, deauthScannerSetup,      deauthScannerLoop,      cleanupWiFi },
   { "Beacon Spam",     nullptr, beaconSpamSetup,         beaconSpamLoop,         cleanupWiFi },
   { "Evil Portal",     nullptr, evilPortalSetup,         evilPortalLoop,         cleanupEvilPortal },
-  { "WLAN Jammer",     nullptr, jammerSetup,             jammerLoop,             cleanupRadio },
   { "Pwnagotchi Detector", nullptr, pwnagotchiDetectorSetup, pwnagotchiDetectorLoop, cleanupWiFi },
   { "Pwnagotchi Spam", nullptr, pwnagotchiSpamSetup,     pwnagotchiSpamLoop,     cleanupWiFi },
   { "Back",            nullptr, nullptr,                 nullptr,                noCleanup }
@@ -442,10 +438,9 @@ MenuItem bleMenu[] = {
   { "AirTag Spoofer", nullptr, airtagSpooferSetup,     airtagSpooferLoop,       cleanupBLE },
   { "Tile Detector", nullptr, tileDetectorSetup,     tileDetectorLoop,       cleanupBLE },
   { "BLE Spammer",  nullptr, bleSpamSetup,             bleSpamLoop,             cleanupBLE },
-  { "BLE Jammer",   nullptr, blejammerSetup,           blejammerLoop,           cleanupRadio },
   { "Swift Pair",   nullptr, swiftpairSpamSetup,       swiftpairSpamLoop,       cleanupBLE },
   { "Sour Apple",   nullptr, sourappleSetup,           sourappleLoop,           cleanupBLE },
-  { "BLE Spoofer",  nullptr, spooferSetup,             spooferLoop,             cleanupBLE },
+  { "BLE Spoofer",  nullptr, bleSpooferSetup,          bleSpooferLoop,          cleanupBLE },
   { "Back",         nullptr, nullptr,                  nullptr,                 noCleanup }
 };
 constexpr int BLE_MENU_SIZE = sizeof(bleMenu) / sizeof(bleMenu[0]);
@@ -571,8 +566,7 @@ void setup() {
   EEPROM.begin(512);
   oledBrightness = EEPROM.read(1);
 
-  uint8_t dangerousValue = EEPROM.read(2);
-  dangerousActionsEnabled = (dangerousValue == 1);
+  dangerousActionsEnabled = false;
 
   loadSleepTimeoutFromEEPROM();
 

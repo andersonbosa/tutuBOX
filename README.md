@@ -83,7 +83,7 @@ Built around an ESP32 with triple NRF24 modules, a crisp OLED display, and a 250
 - **BLE Spammer** – Broadcasts BLE advertisement packets for testing
 - **Swift Pair** - Triggers Windows Swift Pair notifications by broadcasting fake Microsoft device advertisements.
 - **Sour Apple** – Mimics Apple Bluetooth signals like AirPods pairing pop-up to test device resilience against protocol exploits.
-- **BLE Spoofer** – Simulates BLE devices for testing and research
+- **BLE Spoofer** – Clones and rebroadcasts detected BLE devices with complete 1:1 replication of MAC address, name, advertising data, scan response, and connectable state.
 
 ### 📡 Signal & Protocol Tools
 - **Flock Detector** - Detects Flock Safety surveillance cameras using dual-mode WiFi and BLE scanning. Identifies devices through SSID patterns, MAC OUI prefixes, and Bluetooth device names. Features real-time signal strength tracking with detailed device info and a locate mode for pinpointing camera positions.

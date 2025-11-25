@@ -18,7 +18,6 @@ extern U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2;
 
 #define EEPROM_ADDRESS_NEOPIXEL 0
 #define EEPROM_ADDRESS_BRIGHTNESS 1
-#define EEPROM_ADDRESS_DANGEROUS_MODE 2
 #define EEPROM_ADDRESS_SLEEP_TIMEOUT 3
 #define EEPROM_ADDRESS_CONTINUOUS_SCAN 4
 
@@ -51,13 +50,9 @@ void handleDangerousActions() {
   if (!dangerousActionsEnabled) {
     if (showLegalDisclaimer()) {
       dangerousActionsEnabled = true;
-      EEPROM.write(EEPROM_ADDRESS_DANGEROUS_MODE, 1);
-      EEPROM.commit();
     }
   } else {
     dangerousActionsEnabled = false;
-    EEPROM.write(EEPROM_ADDRESS_DANGEROUS_MODE, 0);
-    EEPROM.commit();
   }
 }
 
