@@ -52,6 +52,7 @@
 #include "../include/cardskimmer_detector.h"
 #include "../include/axon_detector.h"
 #include "../include/flock_detector.h"
+#include "../include/pineapple_detector.h"
 #include "../include/display_mirror.h"
 
 RF24 radios[] = {
@@ -420,6 +421,7 @@ MenuItem wifiMenu[] = {
   { "Deauth Scanner",  nullptr, deauthScannerSetup,      deauthScannerLoop,      cleanupWiFi },
   { "Beacon Spam",     nullptr, beaconSpamSetup,         beaconSpamLoop,         cleanupWiFi },
   { "Evil Portal",     nullptr, evilPortalSetup,         evilPortalLoop,         cleanupEvilPortal },
+  { "Pineapple Detector", nullptr, pineappleDetectorSetup, pineappleDetectorLoop, cleanupWiFi },
   { "Pwnagotchi Detector", nullptr, pwnagotchiDetectorSetup, pwnagotchiDetectorLoop, cleanupWiFi },
   { "Pwnagotchi Spam", nullptr, pwnagotchiSpamSetup,     pwnagotchiSpamLoop,     cleanupWiFi },
   { "Back",            nullptr, nullptr,                 nullptr,                noCleanup }
