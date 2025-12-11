@@ -61,7 +61,7 @@ RF24 radios[] = {
   RF24(RADIO_CE_PIN_3, RADIO_CSN_PIN_3)
 };
 
-U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE);
+U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE, DISPLAY_PIN_SCL, DISPLAY_PIN_SDA);
 Adafruit_NeoPixel pixels(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 extern uint8_t oledBrightness;
 
@@ -581,22 +581,22 @@ void setup() {
   u8g2.clearBuffer();
   
   u8g2.setFont(u8g2_font_helvB14_tr);
-  const char* title = "nyanBOX";
+  const char* title = "1337BOX";
   int16_t titleW = u8g2.getUTF8Width(title);
   u8g2.setCursor((128 - titleW) / 2, 16);
   u8g2.print(title);
 
   u8g2.setFont(u8g2_font_helvR08_tr);
-  const char* url = "nyandevices.com";
+  const char* url = "andersonbosa.github.io";
   int16_t urlW = u8g2.getUTF8Width(url);
   u8g2.setCursor((128 - urlW) / 2, 32);
   u8g2.print(url);
 
   u8g2.setFont(u8g2_font_helvR08_tr);
-  int16_t creditWidth = u8g2.getUTF8Width("by jbohack & zr_crackiin");
+  int16_t creditWidth = u8g2.getUTF8Width("by tutu");
   int16_t creditX = (128 - creditWidth) / 2;
   u8g2.setCursor(creditX, 50);
-  u8g2.print("by jbohack & zr_crackiin");
+  u8g2.print("by tutu");
 
   u8g2.setFont(u8g2_font_helvR08_tr);
   int16_t verW = u8g2.getUTF8Width(nyanboxVersion);

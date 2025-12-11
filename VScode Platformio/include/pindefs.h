@@ -9,10 +9,10 @@
 #define PINDEFS_H
 
 // Button Pin Definitions
-#define BUTTON_PIN_UP      39
-#define BUTTON_PIN_DOWN    38
+#define BUTTON_PIN_UP      38
+#define BUTTON_PIN_DOWN    36
 #define BUTTON_PIN_CENTER  37  // Exit
-#define BUTTON_PIN_LEFT    36  // Back
+#define BUTTON_PIN_LEFT    39  // Back
 #define BUTTON_PIN_RIGHT   35  // Select
 
 // Radio Pins
@@ -27,7 +27,7 @@
 #define NEOPIXEL_PIN        14
 
 // Display
-#define DISPLAY_SDA         12
-#define DISPLAY_SCK         13
+#define DISPLAY_PIN_SCL 8
+#define DISPLAY_PIN_SDA 9
 
 #endif // PINDEFS_H
