@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/0eba90bc-2ff5-40df-88a1-92e23396d1d3" alt="logo" width="100" height="auto" />
+  <img src="./icons/logo_tutubox.png" alt="logo" width="100" height="auto" />
   
   <h1>tutuBOX</h1>
   <p>All-in-One Gadget for BLE and 2.4GHz Networks</p>
@@ -19,8 +19,8 @@
   </p>
 
   <h3>
-    <a href="https://andersonbosa.github.io/tutuBOX">🌐 Learn More</a> ·
-    <a href="https://discord.gg/DISCORD_ID">💬 Join Discord</a>
+    <!-- <a href="https://andersonbosa.github.io/tutuBOX">🌐 Learn More</a> · -->
+    <!-- <a href="https://discord.gg/DISCORD_ID">💬 Join Discord</a> -->
   </h3>
 </div>
 
