@@ -1,6 +1,6 @@
 /* ____________________________
    This software is licensed under the MIT License:
-   https://github.com/jbohack/nyanBOX
+   https://github.com/andersonbosa/tutuBOX/tutuBOX
    ________________________________________ */
 
 #include <Arduino.h>
@@ -430,7 +430,7 @@ constexpr int WIFI_MENU_SIZE = sizeof(wifiMenu) / sizeof(wifiMenu[0]);
 
 MenuItem bleMenu[] = {
   { "BLE Scan",     nullptr, blescanSetup,             blescanLoop,             cleanupBLE },
-  { "nyanBOX Detector", nullptr, nyanboxDetectorSetup,         nyanboxDetectorLoop,         cleanupBLE },
+  { "tutuBOX Detector", nullptr, nyanboxDetectorSetup,         nyanboxDetectorLoop,         cleanupBLE },
   { "Flipper Zero Detector", nullptr, flipperZeroDetectorSetup, flipperZeroDetectorLoop, cleanupBLE },
   { "Axon Detector", nullptr, axonDetectorSetup, axonDetectorLoop, cleanupBLE },
   { "Meshtastic Detector", nullptr, meshtasticDetectorSetup, meshtasticDetectorLoop, cleanupBLE },

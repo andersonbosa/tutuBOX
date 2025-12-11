@@ -1,6 +1,6 @@
 /* ____________________________
    This software is licensed under the MIT License:
-   https://github.com/jbohack/nyanBOX
+   https://github.com/andersonbosa/tutuBOX/tutuBOX
    ________________________________________
 */
 
@@ -28,6 +28,7 @@ namespace {
 const uint8_t channels[] = {1, 6, 11};
 
 const char ssids[] PROGMEM = {
+  "tutu was here\n"
   "Mom Use This One\n"
   "Abraham Linksys\n"
   "Benjamin FrankLAN\n"
@@ -38,10 +39,6 @@ const char ssids[] PROGMEM = {
   "I Believe Wi Can Fi\n"
   "Tell My Wi-Fi Love Her\n"
   "No More Mister Wi-Fi\n"
-  "Subscribe to TalkingSasquach\n"
-  "jbohack was here\n"
-  "zr_crackiin was here\n"
-  "nyandevices.com\n"
   "LAN Solo\n"
   "The LAN Before Time\n"
   "Silence of the LANs\n"

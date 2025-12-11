@@ -7,7 +7,7 @@ OUT_DIR="$REPO_ROOT/firmware-files"
 ABOUT_FILE="$PLATFORMIO_DIR/include/about.h"
 BUILD_DIR="$PLATFORMIO_DIR/.pio/build/nyanbox-main"
 
-echo "Building nyanBOX firmware..."
+echo "Building tutuBOX firmware..."
 
 if [ ! -f "$ABOUT_FILE" ]; then
     echo "about.h not found."
@@ -34,18 +34,18 @@ cp -f "$BUILD_DIR/firmware.bin" "$OUT_DIR/" 2>/dev/null || true
 
 cat > "$OUT_DIR/manifest.json" <<EOF
 {
-  "name": "nyanBOX",
+  "name": "tutuBOX",
   "version": "$VERSION",
   "home_assistant_domain": "esphome",
-  "funding_url": "https://shop.nyandevices.com",
+  "funding_url": "https://shop.andersonbosa.github.io/tutuBOX",
   "new_install_prompt_erase": true,
   "builds": [
     {
       "chipFamily": "ESP32",
       "parts": [
-        { "path": "https://raw.githubusercontent.com/jbohack/nyanBOX/main/firmware-files/bootloader.bin", "offset": 4096 },
-        { "path": "https://raw.githubusercontent.com/jbohack/nyanBOX/main/firmware-files/partitions.bin", "offset": 32768 },
-        { "path": "https://raw.githubusercontent.com/jbohack/nyanBOX/main/firmware-files/firmware.bin", "offset": 65536 }
+        { "path": "https://raw.githubusercontent.com/andersonbosa/tutuBOX/main/firmware-files/bootloader.bin", "offset": 4096 },
+        { "path": "https://raw.githubusercontent.com/andersonbosa/tutuBOX/main/firmware-files/partitions.bin", "offset": 32768 },
+        { "path": "https://raw.githubusercontent.com/andersonbosa/tutuBOX/main/firmware-files/firmware.bin", "offset": 65536 }
       ]
     }
   ]

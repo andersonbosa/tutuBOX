@@ -1,6 +1,6 @@
 /* ____________________________
    This software is licensed under the MIT License:
-   https://github.com/jbohack/nyanBOX
+   https://github.com/andersonbosa/tutuBOX/tutuBOX
    ________________________________________
 */
 
@@ -54,14 +54,14 @@ const char* faces[] = {
     "(◔‿◔)",
     "(UwU)",
     "(>_<)",
-    "nyanBOX!~"
+    "tutuBOX!~"
 };
 
 // Pwnagotchi names
 const char* names[] = {
-    "nyanBOX!~",
-    "nyandevices.com",
-    "jbohack was here",
+    "tutuBOX!~",
+    "andersonbosa.github.io/tutuBOX",
+    "andersonbosa was here",
     "zRCrackiin was here",
     "Sub to TalkingSasquach",
     "Don't be a skid",

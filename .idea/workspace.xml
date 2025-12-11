@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="CMakeProjectFlavorService">
+    <option name="flavorId" value="CMakePlainProjectFlavor" />
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="cb2c5de1-1535-4670-8031-a41afb1e98b4" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/.vscode/extensions.json" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/.vscode/extensions.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/.vscode/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/hardware-test/nyanbox_hardware_test.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/hardware-test/hardware_test.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/about.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/about.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/airtag_detector.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/airtag_detector.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/airtag_spoofer.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/airtag_spoofer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/analyzer.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/analyzer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/axon_detector.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/axon_detector.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/beacon_spam.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/beacon_spam.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/ble_spammer.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/ble_spammer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/ble_spoofer.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/ble_spoofer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/blescan.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/blescan.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/cardskimmer_detector.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/cardskimmer_detector.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/channel_analyzer.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/channel_analyzer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/deauth.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/deauth.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/deauth_scanner.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/deauth_scanner.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/display_mirror.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/display_mirror.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/evil_portal.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/evil_portal.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/flipperzero_detector.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/flipperzero_detector.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/flock_detector.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/flock_detector.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/icon.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/icon.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/legal_disclaimer.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/legal_disclaimer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/level_system.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/level_system.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/meshcore_detector.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/meshcore_detector.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/meshtastic_detector.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/meshtastic_detector.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/neopixel.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/neopixel.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/nyanbox_advertiser.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/nyanbox_advertiser.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/nyanbox_common.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/nyanbox_common.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/nyanbox_detector.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/nyanbox_detector.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/pindefs.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/pindefs.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/pineapple_detector.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/pineapple_detector.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/pwnagotchi_detector.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/pwnagotchi_detector.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/pwnagotchi_spam.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/pwnagotchi_spam.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/scanner.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/scanner.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/setting.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/setting.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/sigkill.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/sigkill.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/sleep_manager.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/sleep_manager.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/snake.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/snake.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/sourapple.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/sourapple.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/swiftpair.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/swiftpair.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/tile_detector.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/tile_detector.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/include/wifiscan.h" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/include/wifiscan.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/platformio.ini" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/platformio.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/quick_build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/quick_build.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/about.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/about.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/airtag_detector.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/airtag_detector.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/airtag_spoofer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/airtag_spoofer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/analyzer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/analyzer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/axon_detector.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/axon_detector.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/beacon_spam.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/beacon_spam.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/ble_spammer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/ble_spammer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/ble_spoofer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/ble_spoofer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/blescan.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/blescan.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/cardskimmer_detector.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/cardskimmer_detector.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/channel_analyzer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/channel_analyzer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/deauth.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/deauth.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/deauth_scanner.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/deauth_scanner.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/display_mirror.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/display_mirror.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/evil_portal.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/evil_portal.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/flipperzero_detector.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/flipperzero_detector.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/flock_detector.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/flock_detector.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/legal_disclaimer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/legal_disclaimer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/level_system.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/level_system.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/meshcore_detector.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/meshcore_detector.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/meshtastic_detector.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/meshtastic_detector.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/neopixel.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/neopixel.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/nyanBOX.ino" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/nyanBOX.ino" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/nyanbox_advertiser.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/nyanbox_advertiser.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/nyanbox_detector.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/nyanbox_detector.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/pineapple_detector.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/pineapple_detector.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/pwnagotchi_detector.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/pwnagotchi_detector.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/pwnagotchi_spam.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/pwnagotchi_spam.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/scanner.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/scanner.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/setting.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/setting.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/sigkill.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/sigkill.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/snake.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/snake.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/sourapple.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/sourapple.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/swiftpair.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/swiftpair.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/tile_detector.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/tile_detector.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/src/wifiscan.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/src/wifiscan.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VScode Platformio/tools/display_viewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/tutuBOX/tools/display_viewer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/firmware-files/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/firmware-files/manifest.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;andersonbosa&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/andersonbosa/fork-tutuBOX.git&quot;,
+    &quot;accountId&quot;: &quot;c7144284-7697-48c3-8201-21b52a0c846e&quot;
+  }
+}</component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="XLLZDtsv" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="36hJ7vw1DwpM23iccqUsWud058K" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cb2c5de1-1535-4670-8031-a41afb1e98b4" name="Changes" comment="" />
+      <created>1765452705647</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1765452705647</updated>
+      <workItem from="1765452706766" duration="1118000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

@@ -1,7 +1,7 @@
 /*
    ____________________________
    This software is licensed under the MIT License:
-   https://github.com/jbohack/nyanBOX
+   https://github.com/andersonbosa/tutuBOX/tutuBOX
    ________________________________________
 */
 
@@ -31,7 +31,7 @@ static esp_ble_adv_params_t adv_params = {
 void generateAdvertiserDeviceName(char *name, size_t size) {
     uint64_t chipid = ESP.getEfuseMac();
     uint16_t chip = (uint16_t)(chipid >> 32);
-    snprintf(name, size, "nyanBOX-%04X", chip);
+    snprintf(name, size, "tutuBOX-%04X", chip);
 }
 
 uint32_t parseAdvertiserVersionToNumber(const char *versionStr) {
@@ -63,7 +63,7 @@ void buildAdvertisementData() {
     advData[advDataLen++] = 0x11;
     advData[advDataLen++] = ESP_BLE_AD_TYPE_128SRV_CMPL;
     
-    const char serviceUUID[] = "nyanBOX-service!";
+    const char serviceUUID[] = "tutuBOX-service!";
     for (int i = 15; i >= 0; i--) {
         advData[advDataLen++] = serviceUUID[i];
     }

@@ -1,7 +1,7 @@
 /* ____________________________
    This software is licensed under the MIT License:
-   https://github.com/jbohack/nyanBOX
-   nyanBOX Hardware Test - Manufacturing QC
+   https://github.com/andersonbosa/tutuBOX/tutuBOX
+   tutuBOX Hardware Test - Manufacturing QC
    ________________________________________
 */
 
@@ -31,7 +31,7 @@ void displayTest() {
     u8g2.drawFrame(0, 0, 128, 64);
     u8g2.drawFrame(2, 2, 124, 60);
     u8g2.setFont(u8g2_font_helvB12_tr);
-    u8g2.drawStr(20, 22, "nyanBOX");
+    u8g2.drawStr(20, 22, "tutuBOX");
     u8g2.setFont(u8g2_font_helvR08_tr);
     u8g2.drawStr(20, 38, "HW TEST ");
     u8g2.drawStr(70, 38, VERSION);
@@ -84,10 +84,10 @@ void setup() {
 
     Serial.println("");
     Serial.println("========================================");
-    Serial.print("nyanBOX Hardware QC Test ");
+    Serial.print("tutuBOX Hardware QC Test ");
     Serial.println(VERSION);
     Serial.println("Manufacturing Quality Control");
-    Serial.println("https://github.com/jbohack/nyanBOX");
+    Serial.println("https://github.com/andersonbosa/tutuBOX/tutuBOX");
     Serial.println("========================================");
 
     u8g2.begin();

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-nyanBOX Display Mirror Viewer
+tutuBOX Display Mirror Viewer
 Cross-platform OLED framebuffer viewer with auto-connection and mirroring.
 Works on Windows, macOS, and Linux out of the box.
 
@@ -74,7 +74,7 @@ class DisplayViewer:
 
     def _setup_ui(self):
         self.root = tk.Tk()
-        self.root.title("nyanBOX Display Mirror")
+        self.root.title("tutuBOX Display Mirror")
         self.root.configure(bg="#111111")
         self.root.resizable(False, False)
 
@@ -129,7 +129,7 @@ class DisplayViewer:
         threading.Thread(target=self._serial_reader, daemon=True).start()
 
     def _find_device(self):
-        """Auto-detect nyanBOX serial port across platforms.
+        """Auto-detect tutuBOX serial port across platforms.
 
         Returns:
             str: Serial port path or None if not found
@@ -327,7 +327,7 @@ class DisplayViewer:
 
 
 def main():
-    print("nyanBOX Display Mirror Viewer")
+    print("tutuBOX Display Mirror Viewer")
     print(f"Platform: {platform.system()} {platform.release()}")
     print(f"Python: {sys.version.split()[0]}")
     print()

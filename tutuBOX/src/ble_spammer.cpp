@@ -1,6 +1,6 @@
 /* ____________________________
    This software is licensed under the MIT License:
-   https://github.com/jbohack/nyanBOX
+   https://github.com/andersonbosa/tutuBOX/tutuBOX
    ________________________________________ */
       
 #include "../include/pindefs.h"
@@ -42,10 +42,10 @@ static esp_ble_adv_params_t adv_params = {
 // NyanBOX Custom Names
 static const char* customNames[] = {
     "zr_crackin was here",
-    "jbohack was here",
-    "nyandevices.com",
+    "andersonbosa was here",
+    "andersonbosa.github.io/tutuBOX",
     "Sub2TalkingSasquach",
-    "nyanBOX",
+    "tutuBOX",
     "Crypto Wallet",
     "Toaster",
     "ATM Machine",

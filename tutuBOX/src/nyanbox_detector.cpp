@@ -1,7 +1,7 @@
 /*
    ____________________________
    This software is licensed under the MIT License:
-   https://github.com/jbohack/nyanBOX
+   https://github.com/andersonbosa/tutuBOX/tutuBOX
    ________________________________________
 */
 
@@ -306,7 +306,7 @@ void nyanboxDetectorSetup() {
     u8g2.setFont(u8g2_font_6x10_tr);
     u8g2.clearBuffer();
     u8g2.drawStr(0, 10, "Scanning for");
-    u8g2.drawStr(0, 20, "nyanBOX Devices...");
+    u8g2.drawStr(0, 20, "tutuBOX Devices...");
     char countStr[32];
     snprintf(countStr, sizeof(countStr), "%d/%d devices", 0, MAX_DEVICES);
     u8g2.drawStr(0, 35, countStr);
@@ -352,7 +352,7 @@ void nyanboxDetectorLoop() {
             u8g2.clearBuffer();
             u8g2.setFont(u8g2_font_6x10_tr);
             u8g2.drawStr(0, 10, "Scanning for");
-            u8g2.drawStr(0, 20, "nyanBOX Devices...");
+            u8g2.drawStr(0, 20, "tutuBOX Devices...");
 
             char countStr[32];
             snprintf(countStr, sizeof(countStr), "%d/%d devices", (int)nyanBoxDevices.size(), MAX_DEVICES);
@@ -517,7 +517,7 @@ void nyanboxDetectorLoop() {
 
             u8g2.setFont(u8g2_font_6x10_tr);
             u8g2.drawStr(0, 10, "Scanning for");
-            u8g2.drawStr(0, 20, "nyanBOX Devices...");
+            u8g2.drawStr(0, 20, "tutuBOX Devices...");
 
             char countStr[32];
             snprintf(countStr, sizeof(countStr), "%d/%d devices", 0, MAX_DEVICES);
@@ -534,7 +534,7 @@ void nyanboxDetectorLoop() {
         } else {
 
             u8g2.setFont(u8g2_font_6x10_tr);
-            u8g2.drawStr(0, 10, "No nyanBOX Devices");
+            u8g2.drawStr(0, 10, "No tutuBOX Devices");
             u8g2.drawStr(0, 20, "found");
             u8g2.setFont(u8g2_font_5x8_tr);
             char timeStr[32];
