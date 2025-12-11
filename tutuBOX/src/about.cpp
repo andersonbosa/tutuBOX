@@ -10,7 +10,7 @@
 #include "snake.h"
 
 extern U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2;
-const char* nyanboxVersion = NYANBOX_VERSION;
+const char* tutuboxVersion = TUTUBOX_VERSION;
 
 #define KONAMI_LENGTH 10
 static const uint8_t konamiSequence[KONAMI_LENGTH] = {
@@ -95,9 +95,9 @@ void aboutLoop() {
   u8g2.print("@andersonbosa");
 
   u8g2.setFont(u8g2_font_helvR08_tr);
-  int16_t verW = u8g2.getUTF8Width(nyanboxVersion);
+  int16_t verW = u8g2.getUTF8Width(tutuboxVersion);
   u8g2.setCursor((128 - verW) / 2, 62);
-  u8g2.print(nyanboxVersion);
+  u8g2.print(tutuboxVersion);
 
   u8g2.sendBuffer();
   displayMirrorSend(u8g2);

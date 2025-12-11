@@ -40,10 +40,7 @@ static esp_ble_adv_params_t adv_params = {
 };
 
 static const char* customNames[] = {
-    "zr_crackin was here",
-    "andersonbosa was here",
-    "andersonbosa.github.io/tutuBOX",
-    "Sub2TalkingSasquach",
+    "tutu was here",
     "tutuBOX",
     "Crypto Wallet",
     "Toaster",

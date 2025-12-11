@@ -48,7 +48,7 @@ void createManufacturerData(uint8_t *manufData) {
     manufData[0] = 0xFF;
     manufData[1] = 0xFF;
     uint16_t level = getCurrentLevel();
-    uint32_t version = parseAdvertiserVersionToNumber(NYANBOX_VERSION);
+    uint32_t version = parseAdvertiserVersionToNumber(TUTUBOX_VERSION);
     manufData[2] = (level >> 8) & 0xFF;
     manufData[3] = level & 0xFF;
     manufData[4] = (version >> 24) & 0xFF;

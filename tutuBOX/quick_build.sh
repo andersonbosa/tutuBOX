@@ -5,7 +5,7 @@ PLATFORMIO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$PLATFORMIO_DIR/.." && pwd)"
 OUT_DIR="$REPO_ROOT/firmware-files"
 ABOUT_FILE="$PLATFORMIO_DIR/include/about.h"
-BUILD_DIR="$PLATFORMIO_DIR/.pio/build/nyanbox-main"
+BUILD_DIR="$PLATFORMIO_DIR/.pio/build/tutubox-main"
 
 echo "Building tutuBOX firmware..."
 
@@ -13,7 +13,7 @@ if [ ! -f "$ABOUT_FILE" ]; then
     echo "about.h not found."
     exit 1
 fi
-VERSION=$(grep -E '#define\s+NYANBOX_VERSION' "$ABOUT_FILE" | grep -oE 'v?[0-9]+\.[0-9]+\.[0-9]+')
+VERSION=$(grep -E '#define\s+TUTUBOX_VERSION' "$ABOUT_FILE" | grep -oE 'v?[0-9]+\.[0-9]+\.[0-9]+')
 [ -z "$VERSION" ] && VERSION="latest"
 
 if command -v pio >/dev/null 2>&1; then
@@ -25,7 +25,7 @@ else
     exit 1
 fi
 
-$PIO run -e nyanbox-main
+$PIO run -e tutubox-main
 
 mkdir -p "$OUT_DIR"
 cp -f "$BUILD_DIR/bootloader.bin" "$OUT_DIR/" 2>/dev/null || true

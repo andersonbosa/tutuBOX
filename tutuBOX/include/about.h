@@ -4,8 +4,8 @@
 #include <U8g2lib.h>
 #include "pindefs.h"
 
-#define NYANBOX_VERSION "v4.11.6"
-extern const char* nyanboxVersion;
+#define TUTUBOX_VERSION "v1.0.0"
+extern const char* tutuboxVersion;
 
 void aboutSetup();
 void aboutLoop();
