@@ -1,10 +1,3 @@
-/* ____________________________
-   This software is licensed under the MIT License:
-   https://github.com/andersonbosa/tutuBOX/tutuBOX
-   tutuBOX Hardware Test - Manufacturing QC
-   ________________________________________
-*/
-
 #include <Arduino.h>
 #include <U8g2lib.h>
 #include <SPI.h>

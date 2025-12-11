@@ -1,11 +1,3 @@
-# 1 "/var/folders/dz/zvj96bd53wxfddp4d48hcfljqzzf54/T/tmp008o07nf"
-#include <Arduino.h>
-# 1 "/Users/anbosa/CLionProjects/fork-nyanBOX/tutuBOX/src/main.ino"
-
-
-
-
-
 #include <Arduino.h>
 #include <SPI.h>
 #include <U8g2lib.h>
@@ -84,14 +76,14 @@ static unsigned long lastActivity = 0;
 static bool displayOff = false;
 const unsigned long MAX_XP_IDLE_TIME = 120000;
 
-unsigned long upLastMillis = 0;
-unsigned long upNextRepeat = 0;
-bool upPressed = false;
-unsigned long upDebounceTime = 0;
+unsigned long upLastMillis    = 0;
+unsigned long upNextRepeat    = 0;
+bool         upPressed        = false;
+unsigned long upDebounceTime  = 0;
 
-unsigned long downLastMillis = 0;
-unsigned long downNextRepeat = 0;
-bool downPressed = false;
+unsigned long downLastMillis  = 0;
+unsigned long downNextRepeat  = 0;
+bool         downPressed      = false;
 unsigned long downDebounceTime = 0;
 
 bool selPrev = false;
@@ -101,37 +93,12 @@ unsigned long selDebounceTime = 0;
 unsigned long rightDebounceTime = 0;
 unsigned long leftDebounceTime = 0;
 
-const unsigned long initialDelay = 500;
+const unsigned long initialDelay   = 500;
 const unsigned long repeatInterval = 250;
-const unsigned long debounceDelay = 200;
+const unsigned long debounceDelay  = 200;
 
 static bool needsRedraw = true;
-void updateLastActivity();
-void updateSleepTimeout(unsigned long newTimeout);
-bool anyButtonPressed();
-void loadSleepTimeoutFromEEPROM();
-void wakeDisplay();
-void checkIdle();
-void drawSelection(int x, int y, int width, int height, bool selected);
-int getXPAmount(const char* appName);
-bool isReconApp(const char* appName);
-bool isDangerousApp(const char* appName);
-bool isOffensiveApp(const char* appName);
-bool isUtilityApp(const char* appName);
-bool justPressed(uint8_t pin, bool &prev, unsigned long &debounceTime);
-bool shouldShowApp(const char* appName);
-int getVisibleMenuSize();
-MenuItem* getVisibleMenuItem(int visibleIndex);
-void startAppTracking(const char* appName);
-void stopAppTracking();
-void updateAppXP();
-void cleanupWiFi();
-void cleanupRadio();
-void cleanupBLE();
-void noCleanup();
-void setup();
-void loop();
-#line 107 "/Users/anbosa/CLionProjects/fork-nyanBOX/tutuBOX/src/main.ino"
+
 void updateLastActivity() {
   lastActivity = millis();
 }
@@ -141,11 +108,11 @@ void updateSleepTimeout(unsigned long newTimeout) {
 }
 
 bool anyButtonPressed() {
-  return digitalRead(BUTTON_PIN_UP) == LOW ||
-        digitalRead(BUTTON_PIN_DOWN) == LOW ||
+  return digitalRead(BUTTON_PIN_UP)    == LOW ||
+        digitalRead(BUTTON_PIN_DOWN)  == LOW ||
         digitalRead(BUTTON_PIN_CENTER)== LOW ||
         digitalRead(BUTTON_PIN_RIGHT) == LOW ||
-        digitalRead(BUTTON_PIN_LEFT) == LOW;
+        digitalRead(BUTTON_PIN_LEFT)  == LOW;
 }
 
 
@@ -227,7 +194,7 @@ int getXPAmount(const char* appName) {
 }
 
 bool isReconApp(const char* appName) {
-  return strstr(appName, "Scan") != nullptr ||
+  return strstr(appName, "Scan") != nullptr || 
          strstr(appName, "Detector") != nullptr ||
          strstr(appName, "Analyzer") != nullptr;
 }
@@ -255,15 +222,15 @@ bool isUtilityApp(const char* appName) {
 }
 
 AppMenuState currentState = APP_MAIN;
-MenuItem* currentMenuItems = nullptr;
-int currentMenuSize = 0;
-int item_selected = 0;
+MenuItem*    currentMenuItems = nullptr;
+int          currentMenuSize  = 0;
+int          item_selected    = 0;
 
-constexpr uint8_t BUTTON_UP = BUTTON_PIN_UP;
-constexpr uint8_t BUTTON_SEL = BUTTON_PIN_CENTER;
-constexpr uint8_t BUTTON_DOWN = BUTTON_PIN_DOWN;
+constexpr uint8_t BUTTON_UP    = BUTTON_PIN_UP;
+constexpr uint8_t BUTTON_SEL   = BUTTON_PIN_CENTER;
+constexpr uint8_t BUTTON_DOWN  = BUTTON_PIN_DOWN;
 constexpr uint8_t BUTTON_RIGHT = BUTTON_PIN_RIGHT;
-constexpr uint8_t BUTTON_LEFT = BUTTON_PIN_LEFT;
+constexpr uint8_t BUTTON_LEFT  = BUTTON_PIN_LEFT;
 
 static unsigned long appStartTime = 0;
 static unsigned long lastXPReward = 0;
@@ -406,7 +373,7 @@ void cleanupRadio() {
     esp_bluedroid_deinit();
     delay(50);
   }
-
+  
   if (btStarted()) {
     btStop();
     delay(50);
@@ -425,7 +392,7 @@ void cleanupBLE() {
     esp_bluedroid_deinit();
     delay(50);
   }
-
+  
   if (btStarted()) {
     btStop();
     delay(50);
@@ -436,53 +403,53 @@ void noCleanup() {
 }
 
 MenuItem mainMenu[] = {
-  { "WiFi", bitmap_icon_wifi, nullptr, nullptr, noCleanup },
-  { "BLE", bitmap_icon_ble, nullptr, nullptr, noCleanup },
+  { "WiFi",  bitmap_icon_wifi,    nullptr, nullptr, noCleanup },
+  { "BLE",   bitmap_icon_ble,     nullptr, nullptr, noCleanup },
   { "Other", bitmap_icon_analyzer, nullptr, nullptr, noCleanup }
 };
 constexpr int MAIN_MENU_SIZE = sizeof(mainMenu) / sizeof(mainMenu[0]);
 
 MenuItem wifiMenu[] = {
-  { "WiFi Scan", nullptr, wifiscanSetup, wifiscanLoop, cleanupWiFi },
-  { "Channel Analyzer", nullptr, channelAnalyzerSetup, channelAnalyzerLoop, cleanupWiFi },
-  { "WiFi Deauther", nullptr, deauthSetup, deauthLoop, cleanupWiFi },
-  { "Deauth Scanner", nullptr, deauthScannerSetup, deauthScannerLoop, cleanupWiFi },
-  { "Beacon Spam", nullptr, beaconSpamSetup, beaconSpamLoop, cleanupWiFi },
-  { "Evil Portal", nullptr, evilPortalSetup, evilPortalLoop, cleanupEvilPortal },
+  { "WiFi Scan",       nullptr, wifiscanSetup,           wifiscanLoop,           cleanupWiFi },
+  { "Channel Analyzer", nullptr, channelAnalyzerSetup,   channelAnalyzerLoop,    cleanupWiFi },
+  { "WiFi Deauther",   nullptr, deauthSetup,             deauthLoop,             cleanupWiFi },
+  { "Deauth Scanner",  nullptr, deauthScannerSetup,      deauthScannerLoop,      cleanupWiFi },
+  { "Beacon Spam",     nullptr, beaconSpamSetup,         beaconSpamLoop,         cleanupWiFi },
+  { "Evil Portal",     nullptr, evilPortalSetup,         evilPortalLoop,         cleanupEvilPortal },
   { "Pineapple Detector", nullptr, pineappleDetectorSetup, pineappleDetectorLoop, cleanupWiFi },
   { "Pwnagotchi Detector", nullptr, pwnagotchiDetectorSetup, pwnagotchiDetectorLoop, cleanupWiFi },
-  { "Pwnagotchi Spam", nullptr, pwnagotchiSpamSetup, pwnagotchiSpamLoop, cleanupWiFi },
-  { "Back", nullptr, nullptr, nullptr, noCleanup }
+  { "Pwnagotchi Spam", nullptr, pwnagotchiSpamSetup,     pwnagotchiSpamLoop,     cleanupWiFi },
+  { "Back",            nullptr, nullptr,                 nullptr,                noCleanup }
 };
 constexpr int WIFI_MENU_SIZE = sizeof(wifiMenu) / sizeof(wifiMenu[0]);
 
 MenuItem bleMenu[] = {
-  { "BLE Scan", nullptr, blescanSetup, blescanLoop, cleanupBLE },
-  { "tutuBOX Detector", nullptr, nyanboxDetectorSetup, nyanboxDetectorLoop, cleanupBLE },
+  { "BLE Scan",     nullptr, blescanSetup,             blescanLoop,             cleanupBLE },
+  { "tutuBOX Detector", nullptr, nyanboxDetectorSetup,         nyanboxDetectorLoop,         cleanupBLE },
   { "Flipper Zero Detector", nullptr, flipperZeroDetectorSetup, flipperZeroDetectorLoop, cleanupBLE },
   { "Axon Detector", nullptr, axonDetectorSetup, axonDetectorLoop, cleanupBLE },
   { "Meshtastic Detector", nullptr, meshtasticDetectorSetup, meshtasticDetectorLoop, cleanupBLE },
   { "MeshCore Detector", nullptr, meshcoreDetectorSetup, meshcoreDetectorLoop, cleanupBLE },
   { "Skimmer Detector", nullptr, cardskimmerDetectorSetup, cardskimmerDetectorLoop, cleanupBLE },
-  { "AirTag Detector", nullptr, airtagDetectorSetup, airtagDetectorLoop, cleanupBLE },
-  { "AirTag Spoofer", nullptr, airtagSpooferSetup, airtagSpooferLoop, cleanupBLE },
-  { "Tile Detector", nullptr, tileDetectorSetup, tileDetectorLoop, cleanupBLE },
-  { "BLE Spammer", nullptr, bleSpamSetup, bleSpamLoop, cleanupBLE },
-  { "Swift Pair", nullptr, swiftpairSpamSetup, swiftpairSpamLoop, cleanupBLE },
-  { "Sour Apple", nullptr, sourappleSetup, sourappleLoop, cleanupBLE },
-  { "BLE Spoofer", nullptr, bleSpooferSetup, bleSpooferLoop, cleanupBLE },
-  { "Back", nullptr, nullptr, nullptr, noCleanup }
+  { "AirTag Detector", nullptr, airtagDetectorSetup,   airtagDetectorLoop,      cleanupBLE },
+  { "AirTag Spoofer", nullptr, airtagSpooferSetup,     airtagSpooferLoop,       cleanupBLE },
+  { "Tile Detector", nullptr, tileDetectorSetup,     tileDetectorLoop,       cleanupBLE },
+  { "BLE Spammer",  nullptr, bleSpamSetup,             bleSpamLoop,             cleanupBLE },
+  { "Swift Pair",   nullptr, swiftpairSpamSetup,       swiftpairSpamLoop,       cleanupBLE },
+  { "Sour Apple",   nullptr, sourappleSetup,           sourappleLoop,           cleanupBLE },
+  { "BLE Spoofer",  nullptr, bleSpooferSetup,          bleSpooferLoop,          cleanupBLE },
+  { "Back",         nullptr, nullptr,                  nullptr,                 noCleanup }
 };
 constexpr int BLE_MENU_SIZE = sizeof(bleMenu) / sizeof(bleMenu[0]);
 
 MenuItem otherMenu[] = {
-  { "SigKill", nullptr, sigkillSetup, sigkillLoop, cleanupRadio },
+  { "SigKill",   nullptr, sigkillSetup,   sigkillLoop,   cleanupRadio },
   { "Flock Detector", nullptr, flockDetectorSetup, flockDetectorLoop, cleanupFlockDetector },
-  { "Scanner", nullptr, scannerSetup, scannerLoop, cleanupRadio },
-  { "Analyzer", nullptr, analyzerSetup, analyzerLoop, cleanupRadio },
-  { "Setting", nullptr, settingSetup, settingLoop, noCleanup },
-  { "About", nullptr, aboutSetup, aboutLoop, aboutCleanup },
-  { "Back", nullptr, nullptr, nullptr, noCleanup }
+  { "Scanner",      nullptr, scannerSetup,    scannerLoop,    cleanupRadio },
+  { "Analyzer",     nullptr, analyzerSetup,   analyzerLoop,   cleanupRadio },
+  { "Setting",      nullptr, settingSetup,    settingLoop,    noCleanup },
+  { "About",        nullptr, aboutSetup,      aboutLoop,      aboutCleanup },
+  { "Back",         nullptr, nullptr,         nullptr,        noCleanup }
 };
 constexpr int OTHER_MENU_SIZE = sizeof(otherMenu) / sizeof(otherMenu[0]);
 
@@ -505,19 +472,19 @@ void enterMenu(AppMenuState st) {
   switch (st) {
     case APP_MAIN:
       currentMenuItems = mainMenu;
-      currentMenuSize = MAIN_MENU_SIZE;
+      currentMenuSize  = MAIN_MENU_SIZE;
       break;
     case APP_WIFI:
       currentMenuItems = wifiMenu;
-      currentMenuSize = WIFI_MENU_SIZE;
+      currentMenuSize  = WIFI_MENU_SIZE;
       break;
     case APP_BLE:
       currentMenuItems = bleMenu;
-      currentMenuSize = BLE_MENU_SIZE;
+      currentMenuSize  = BLE_MENU_SIZE;
       break;
     case APP_OTHER:
       currentMenuItems = otherMenu;
-      currentMenuSize = OTHER_MENU_SIZE;
+      currentMenuSize  = OTHER_MENU_SIZE;
       break;
   }
 
@@ -540,9 +507,9 @@ void runApp(MenuItem &mi) {
   startAppTracking(mi.name);
 
   if (isReconApp(mi.name)) {
-    blinkColor(0, 0, 255);
+    blinkColor(0, 0, 255);  // Blue
   } else if (isOffensiveApp(mi.name)) {
-    blinkColor(255, 0, 0);
+    blinkColor(255, 0, 0); // Red
   }
 
   mi.setup();
@@ -607,7 +574,7 @@ void setup() {
   updateLastActivity();
 
   u8g2.clearBuffer();
-
+  
   u8g2.setFont(u8g2_font_helvB14_tr);
   const char* title = "1337BOX";
   int16_t titleW = u8g2.getUTF8Width(title);
