@@ -603,7 +603,7 @@ void setup() {
 
   u8g2.clearBuffer();
   // u8g2.drawXBMP(0, 0, 128, 64, logo_nyanbox);
-  u8g2.drawXBMP(0, 0, 128, 64, logo_tutubox);
+  u8g2.drawXBMP(0, 0, 128, 64, logo_tutubox_64);
   u8g2.sendBuffer();
   delay(1500);
 

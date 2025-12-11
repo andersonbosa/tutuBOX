@@ -177,7 +177,7 @@ void scannerSetup() {
     sensorArray[count] = 0;
   }
 
-  SPI.begin(18, 19, 23, 17);
+  SPI.begin(RADIO_SCK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN, RADIO_SS_PIN);
   delay(100);
   SPI.setDataMode(SPI_MODE0);
   SPI.setFrequency(16000000);

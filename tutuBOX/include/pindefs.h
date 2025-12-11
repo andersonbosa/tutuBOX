@@ -17,6 +17,11 @@
 #define RADIO_CE_PIN_3      16
 #define RADIO_CSN_PIN_3     17
 
+#define RADIO_SCK_PIN       18
+#define RADIO_MISO_PIN      19
+#define RADIO_MOSI_PIN      23
+#define RADIO_SS_PIN        17
+
 // NeoPixel
 #define NEOPIXEL_PIN        14
 
