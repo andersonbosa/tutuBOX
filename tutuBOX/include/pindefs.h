@@ -10,8 +10,8 @@
 #define BUTTON_PIN_RIGHT   35  // Select
 
 // Radio Pins
-#define RADIO_CE_PIN_1      5
-#define RADIO_CSN_PIN_1     6
+#define RADIO_CE_PIN_1      5 // marrom=branco
+#define RADIO_CSN_PIN_1     6 // laranja=cinza
 #define RADIO_CE_PIN_2      7
 #define RADIO_CSN_PIN_2     15
 #define RADIO_CE_PIN_3      16
@@ -19,7 +19,7 @@
 
 #define RADIO_SCK_PIN       18
 #define RADIO_MISO_PIN      19
-#define RADIO_MOSI_PIN      23
+#define RADIO_MOSI_PIN      20 // esp32-s3 nao tem 23, troquei para 20
 #define RADIO_SS_PIN        17
 
 // NeoPixel
