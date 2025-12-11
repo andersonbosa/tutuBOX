@@ -1,7 +1,3 @@
-/* ____________________________
-   This software is licensed under the MIT License:
-   https://github.com/andersonbosa/tutuBOX/tutuBOX
-   ________________________________________ */
 
 #include "../include/evil_portal.h"
 #include "../include/sleep_manager.h"

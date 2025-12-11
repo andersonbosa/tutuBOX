@@ -1,7 +1,3 @@
-/* ____________________________
-   This software is licensed under the MIT License:
-   https://github.com/andersonbosa/tutuBOX/tutuBOX
-   ________________________________________ */
 
 // 'apple', 16x16px
 const unsigned char bitmap_icon_apple [] PROGMEM = {

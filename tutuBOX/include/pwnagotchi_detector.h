@@ -1,8 +1,3 @@
-/* ____________________________
-   This software is licensed under the MIT License:
-   https://github.com/andersonbosa/tutuBOX/tutuBOX
-   ________________________________________ */
-
 #ifndef PWNAGOTCHI_DETECTOR_H
 #define PWNAGOTCHI_DETECTOR_H
 

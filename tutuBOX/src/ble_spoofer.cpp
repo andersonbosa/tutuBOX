@@ -1,8 +1,3 @@
-/* ____________________________
-   This software is licensed under the MIT License:
-   https://github.com/andersonbosa/tutuBOX/tutuBOX
-   ________________________________________
-*/
 
 #include "../include/ble_spoofer.h"
 #include "../include/blescan.h"

@@ -1,7 +1,3 @@
-/* ____________________________
-   This software is licensed under the MIT License:
-   https://github.com/andersonbosa/tutuBOX/tutuBOX
-   ________________________________________ */
 
 #ifndef LEVEL_SYSTEM_H
 #define LEVEL_SYSTEM_H

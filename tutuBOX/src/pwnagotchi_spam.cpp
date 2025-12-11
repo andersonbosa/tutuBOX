@@ -1,8 +1,3 @@
-/* ____________________________
-   This software is licensed under the MIT License:
-   https://github.com/andersonbosa/tutuBOX/tutuBOX
-   ________________________________________
-*/
 
 #include "../include/pwnagotchi_spam.h"
 #include "../include/sleep_manager.h"

@@ -1,9 +1,3 @@
-/* ____________________________
-   This software is licensed under the MIT License:
-   https://github.com/andersonbosa/tutuBOX/tutuBOX
-   ________________________________________
-*/
-
 #ifndef BEACON_SPAM_H
 #define BEACON_SPAM_H
 

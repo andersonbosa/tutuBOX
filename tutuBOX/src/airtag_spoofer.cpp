@@ -1,8 +1,3 @@
-/* ____________________________
-   This software is licensed under the MIT License:
-   https://github.com/andersonbosa/tutuBOX/tutuBOX
-   ________________________________________
-*/
 
 #include "../include/airtag_spoofer.h"
 #include "../include/airtag_detector.h"

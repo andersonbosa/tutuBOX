@@ -1,7 +1,3 @@
-/* ____________________________
-   This software is licensed under the MIT License:
-   https://github.com/andersonbosa/tutuBOX/tutuBOX
-   ________________________________________ */
 
 #ifndef EVIL_PORTAL_H
 #define EVIL_PORTAL_H

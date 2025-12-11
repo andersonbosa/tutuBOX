@@ -1,9 +1,3 @@
-/* ____________________________
-   This software is licensed under the MIT License:
-   https://github.com/andersonbosa/tutuBOX/tutuBOX
-   ________________________________________
-*/
-
 #ifndef DEAUTH_H
 #define DEAUTH_H
 
