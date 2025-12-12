@@ -581,22 +581,22 @@ void setup() {
   u8g2.clearBuffer();
   
   u8g2.setFont(u8g2_font_helvB14_tr);
-  const char* title = "nyanBOX";
+  const char* title = "tutuBOX";
   int16_t titleW = u8g2.getUTF8Width(title);
   u8g2.setCursor((128 - titleW) / 2, 16);
   u8g2.print(title);
 
   u8g2.setFont(u8g2_font_helvR08_tr);
-  const char* url = "nyandevices.com";
+  const char* url = "andersonbosa.github.com";
   int16_t urlW = u8g2.getUTF8Width(url);
   u8g2.setCursor((128 - urlW) / 2, 32);
   u8g2.print(url);
 
   u8g2.setFont(u8g2_font_helvR08_tr);
-  int16_t creditWidth = u8g2.getUTF8Width("by jbohack & zr_crackiin");
+  int16_t creditWidth = u8g2.getUTF8Width("by @andersonbosadev");
   int16_t creditX = (128 - creditWidth) / 2;
   u8g2.setCursor(creditX, 50);
-  u8g2.print("by jbohack & zr_crackiin");
+  u8g2.print("by @andersonbosadev");
 
   u8g2.setFont(u8g2_font_helvR08_tr);
   int16_t verW = u8g2.getUTF8Width(nyanboxVersion);
