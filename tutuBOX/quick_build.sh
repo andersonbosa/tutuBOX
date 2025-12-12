@@ -5,7 +5,7 @@ PLATFORMIO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$PLATFORMIO_DIR/.." && pwd)"
 OUT_DIR="$REPO_ROOT/firmware-files"
 ABOUT_FILE="$PLATFORMIO_DIR/include/about.h"
-BUILD_DIR="$PLATFORMIO_DIR/.pio/build/nyanbox-main"
+BUILD_DIR="$PLATFORMIO_DIR/.pio/build/tutubox-main"
 
 echo "Building nyanBOX firmware..."
 
@@ -25,7 +25,7 @@ else
     exit 1
 fi
 
-$PIO run -e nyanbox-main
+$PIO run -e tutubox-main
 
 mkdir -p "$OUT_DIR"
 cp -f "$BUILD_DIR/bootloader.bin" "$OUT_DIR/" 2>/dev/null || true
